@@ -1,15 +1,20 @@
 import { gql } from "apollo-server";
 
 export const typeDefs = gql`
+  scalar Upload
+
   type User {
     userId: ID! @id
     username: String!
+    email: String!
+    token: String!
+    iconPath: String!
   }
 
   type Post {
     postId: ID! @id
-    title: String!
     content: String!
+    imagePath: String!
     author: User! @relationship(type: "AUTHOR", direction: IN)
     likes: Int
     comments: [Comment!]! @relationship(type: "COMMENT", direction: IN)
@@ -25,6 +30,12 @@ export const typeDefs = gql`
     likeId: ID! @id
     post: Post! @relationship(type: "POST", direction: IN)
     user: User! @relationship(type: "USER", direction: IN)
+  }
+
+  type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
   }
 
   input CreateCommentInput {
@@ -47,5 +58,6 @@ export const typeDefs = gql`
     createComment(input: CreateCommentInput!): Comment
     createPost(input: CreatePostInput!): Post
     likePost(input: LikePostInput!): Like
+    singleUpload(file: Upload!): File!
   }
 `;

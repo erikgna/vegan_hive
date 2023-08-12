@@ -1,6 +1,13 @@
+import path, { resolve } from "path";
+import fs, { createWriteStream, mkdir, unlink } from "fs";
+import { GraphQLUpload } from "graphql-upload-minimal";
+import { finished } from "stream";
+
 import { driver } from ".";
 
 export const resolvers = {
+  Upload: GraphQLUpload,
+
   Mutation: {
     createComment: async (_: any, args: any) => {
       const { content, authorId } = args.input;
@@ -84,6 +91,39 @@ export const resolvers = {
         return result.records[0].get("c").properties;
       } finally {
         session.close();
+      }
+    },
+    singleUpload: async (parent: any, { file }: any) => {
+      try {
+        const { createReadStream, filename, mimetype } = await file;
+
+        console.log(filename);
+
+        const bucketFolderPath = path.join(__dirname, "public");
+        if (mimetype !== "image/png" && mimetype !== "image/jpeg") {
+          throw new Error(
+            "Invalid file format. Only PNG and JPG images are supported."
+          );
+        }
+
+        const filePath = path.join(bucketFolderPath, filename);
+
+        const readStream = createReadStream();
+        const writeStream = createWriteStream(filePath);
+
+        writeStream.on("finish", resolve);
+
+        writeStream.on("error", (error) => {
+          unlink(filePath, () => {
+            console.log(error);
+          });
+        });
+
+        readStream.pipe(writeStream);
+
+        return { filename, mimetype };
+      } catch (error) {
+        console.log(error);
       }
     },
   },

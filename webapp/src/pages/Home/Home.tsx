@@ -1,5 +1,8 @@
+import { gql, useApolloClient, useMutation } from "@apollo/client"
+
 import { Post } from "../../components/Post"
 import { IPost } from "../../interfaces/Post"
+import { useState } from "react"
 
 const posts: IPost[] = [
     {
@@ -81,14 +84,38 @@ const posts: IPost[] = [
     },
 ]
 
+const SINGLE_UPLOAD_MUTATION = gql`
+  mutation SingleUpload($file: Upload!) {
+    singleUpload(file: $file) {
+      id
+    }
+  }
+`;
+
+
 export const Home = () => {
+    const [uploadFileMutation] = useMutation(SINGLE_UPLOAD_MUTATION);
+    const apolloClient = useApolloClient();
+
+    const [file, setFile] = useState<File | undefined>()
+
+    const teste = async () => {
+        uploadFileMutation({ variables: { file } }).then(() => {
+            apolloClient.resetStore();
+        });
+    }
+
     return (
         <section className='w-full flex justify-center pb-8 dark:bg-black'>
-            <div className="flex flex-col align-center max-post-width">
+            <button onClick={teste}>
+                teste
+            </button>
+            <input type="file" onChange={e => setFile(e.target.files?.[0])} />
+            {/* <div className="flex flex-col align-center max-post-width">
                 {posts.map(post => (
                     <Post key={post.postId} post={post} />
                 ))}
-            </div>
+            </div> */}
         </section>
     )
 }
