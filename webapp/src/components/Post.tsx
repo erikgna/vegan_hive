@@ -3,21 +3,51 @@ import { useState } from 'react'
 import { IPost } from '../interfaces/Post'
 import { PostModal } from './PostModal'
 import { Modal } from './Modal'
+import { formatDateString } from '../utils/dealDate'
+import { BASE_URL } from '../constants/Url'
 
-// import likedIcon from '../assets/icons/heart-solid.svg'
+import likedIcon from '../assets/icons/heart-solid.svg'
 import likeIconWhite from '../assets/icons/heart-regular-white.svg'
 import likeIconDark from '../assets/icons/heart-regular-dark.svg'
 import trashIconDark from '../assets/icons/trash-solid-dark.svg'
 import trashIconWhite from '../assets/icons/trash-solid-white.svg'
+import defaultAvatar from '../assets/images/default_avatar.png'
+import { auth } from '../../firebase'
+import { gql, useMutation } from '@apollo/client'
+
 
 interface PostProps {
     post: IPost;
     isFromUser?: boolean;
 }
 
+const CREATE_COMMENT = gql`  
+    mutation CreateComment($input: CreateCommentInput!) {
+        createComment(input: $input) {
+            content
+            date
+            author {
+              iconPath
+              username
+            }
+        }
+    }
+`
+
+const LIKE_POST = gql`  
+    mutation LikePost($input: LikePostInput!) {
+        likePost(input: $input) {
+            likeId
+        }
+    }
+`
+
 export const Post = ({ post, isFromUser = false }: PostProps) => {
     const [showPostModal, setShowPostModal] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
+    const [text, setText] = useState<string>('')
+    const [createComment] = useMutation(CREATE_COMMENT);
+    const [likePost] = useMutation(LIKE_POST);
 
     const changePostModal = () => {
         setShowPostModal(!showPostModal)
@@ -25,6 +55,29 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
 
     const changeModal = () => {
         setShowModal(!showModal)
+    }
+
+    const handleLikePost = () => {
+        likePost({
+            variables: {
+                input: {
+                    authorEmail: auth.currentUser?.email,
+                    postId: post.postId
+                }
+            }
+        }).then((data) => console.log(data))
+    }
+
+    const handlePostComment = () => {
+        createComment({
+            variables: {
+                input: {
+                    content: text,
+                    authorEmail: auth.currentUser?.email,
+                    postId: post.postId
+                }
+            }
+        })
     }
 
     return (
@@ -44,18 +97,22 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
             }
             <div className="flex items-center mb-4">
                 <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/President_Barack_Obama.jpg/245px-President_Barack_Obama.jpg"
+                    src={post.author.iconPath ?? defaultAvatar}
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full mr-2"
                 />
-                <span className="text-gray-700 text-lg font-semibold dark:text-white">{post.author.username} - <span className='font-normal text-sm'>{post.date}</span></span>
+                <span className="text-gray-700 text-lg font-semibold dark:text-white">{post.author.username} - <span className='font-normal text-sm'>{formatDateString(post.date)}</span></span>
             </div>
             <p className="text-gray-600 mb-4 dark:text-white">{post.content}</p>
-            <img src="https://media.cnn.com/api/v1/images/stellar/prod/170407220916-04-iconic-mountains-matterhorn-restricted.jpg?q=w_2512,h_1413,x_0,y_0,c_fill/h_618" alt="Post Image" className="mb-4 rounded-md" />
+            <img src={`${BASE_URL}${post.imagePath}`} alt={post.content} className="mb-4 rounded-md" />
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
-                    <button className="mr-2">
-                        <img className='w-6 h-6' src={window.localStorage.getItem('theme')?.includes('dark') ? likeIconWhite : likeIconDark} alt="like button" />
+                    <button onClick={handleLikePost} className="mr-2">
+                        {auth.currentUser?.email === post.author.email ?
+                            <img className="w-6 h-6" src={likedIcon} alt="like button" />
+                            :
+                            <img className="w-6 h-6" src={window.localStorage.getItem('theme')?.includes('dark') ? likeIconWhite : likeIconDark} alt="like button" />
+                        }
                     </button>
                     <span className="text-gray-500 mr-2 dark:text-white">{post.likes} likes</span>
                 </div>
@@ -74,11 +131,13 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
             </div>
             <div className="flex mt-4">
                 <input
+                    onChange={(e) => setText(e.target.value)}
+                    value={text}
                     type="text"
                     placeholder="Add a comment..."
                     className="flex-grow p-2 border-y border-l border-gray-300 rounded-l-md focus:outline-none focus:border-yellow-500 dark:bg-transparent"
                 />
-                <button className="px-4 py-2 bg-yellow-500 text-white rounded-r-md hover:bg-yellow-600 focus:outline-none transition-all duration-300">
+                <button onClick={handlePostComment} className="px-4 py-2 bg-yellow-500 text-white rounded-r-md hover:bg-yellow-600 focus:outline-none transition-all duration-300">
                     Post
                 </button>
             </div>

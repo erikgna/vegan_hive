@@ -7,18 +7,49 @@ import { saveFile } from "./utils/saveFile";
 export const resolvers = {
   Upload: GraphQLUpload,
 
+  Query: {
+    checkIfUserLikedPost: async (_: any, args: any) => {
+      const { authorEmail, postId } = args;
+      const session = driver.session();
+
+      try {
+        const hasLike = await session.executeRead(async (tx) => {
+          const query = `
+        MATCH (:Post {postId: $postId})--(like:Like)
+        MATCH (:User {email: $authorEmail})--(like2:Like)
+        WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
+        RETURN [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
+      `;
+          const params = {
+            postId,
+            authorEmail,
+          };
+
+          const result = await tx.run(query, params);
+          const commonLikes = result.records[0].get("commonLikes");
+
+          return commonLikes.length > 0;
+        });
+
+        return hasLike;
+      } catch (error) {}
+    },
+  },
+
   Mutation: {
     createComment: async (_: any, args: any) => {
       const { content, authorEmail, postId } = args.input;
       const session = driver.session();
 
       try {
-        const result = await session.executeWrite(async (tx: any) => {
+        const result = await session.executeWrite(async (transaction) => {
+          const date = new Date().toISOString();
           const createCommentQuery = `
             MATCH (a:User {email: $authorEmail})
             CREATE (c:Comment {
               commentId: randomUUID(),
-              content: $content
+              content: $content,
+              date: $date
             })-[:AUTHOR]->(a)
             RETURN c
           `;
@@ -26,29 +57,40 @@ export const resolvers = {
           const createCommentParams = {
             content,
             authorEmail,
+            date,
           };
 
-          const commentResult = await tx.run(
+          const commentResult = await transaction.run(
             createCommentQuery,
             createCommentParams
           );
-          const commentProperties =
-            commentResult.records[0].get("c").properties;
+          const commentNode = commentResult.records[0].get("c");
 
           const addCommentToPostQuery = `
             MATCH (p:Post {postId: $postId})
             MATCH (c:Comment {commentId: $commentId})
             CREATE (c)-[:COMMENT]->(p)
+            RETURN c
           `;
 
           const addCommentToPostParams = {
             postId,
-            commentId: commentProperties.commentId,
+            commentId: commentNode.properties.commentId,
           };
 
-          await tx.run(addCommentToPostQuery, addCommentToPostParams);
+          const commentWithRelationResult = await transaction.run(
+            addCommentToPostQuery,
+            addCommentToPostParams
+          );
 
-          return commentProperties;
+          const commentWithRelationNode =
+            commentWithRelationResult.records[0].get("c");
+
+          // Agora, relacione o autor ao Comment diretamente
+          commentWithRelationNode.properties.author =
+            commentNode.properties.author;
+
+          return commentWithRelationNode.properties;
         });
 
         return result;
@@ -92,12 +134,13 @@ export const resolvers = {
 
     createPost: async (_: any, args: any, context: any) => {
       const { content, authorEmail, file } = args.input;
-      console.log("teste");
+
       const userInfo = await verifyToken(context.firebaseId);
       const session = driver.session();
 
       try {
         const result = await session.executeWrite(async (tx: any) => {
+          const date = new Date().toISOString();
           const query = `
             MATCH (a:User {email: $authorEmail})
             CREATE (c:Post {
@@ -105,7 +148,7 @@ export const resolvers = {
               imagePath: '',
               content: $content,
               likes: 0,
-              date: datetime()
+              date: $date
             })-[:AUTHOR]->(a)
             RETURN c
           `;
@@ -113,6 +156,7 @@ export const resolvers = {
           const params = {
             content,
             authorEmail,
+            date,
           };
 
           const result = await tx.run(query, params);
@@ -139,7 +183,6 @@ export const resolvers = {
 
         return result;
       } catch (e) {
-        console.log(e);
         session.close();
       } finally {
         session.close();
@@ -151,87 +194,77 @@ export const resolvers = {
       const session = driver.session();
 
       try {
-        const existingLike = await session.readTransaction(async (tx: any) => {
+        const wasDeleted = await session.executeWrite(async (tx) => {
           const query = `
-            MATCH (u:User {email: $authorEmail})-[:USER]->(like:Like)-[:POST]->(p:Post {postId: $postId})
-            RETURN like
-          `;
-
+              MATCH (:Post {postId: '4a7659ae-5283-4feb-a81c-6932b3cbc28f'})--(like:Like)
+              MATCH (:User {email: 'erikgnaa@gmail.com'})--(like2:Like)
+              WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
+              WITH [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
+              UNWIND commonLikes AS likeToDelete
+              DETACH DELETE likeToDelete
+            `;
           const params = {
             authorEmail,
             postId,
           };
 
           const result = await tx.run(query, params);
+          const counter =
+            result.summary.counters.updates().nodesDeleted +
+            result.summary.counters.updates().relationshipsDeleted;
 
-          return result.records[0]?.get("like");
+          return counter > 0;
         });
 
-        if (existingLike) {
-          await session.writeTransaction(async (tx: any) => {
-            const deleteQuery = `
-              MATCH (u:User {email: $authorEmail})-[:USER]->(like:Like)-[:POST]->(p:Post {postId: $postId})
-              DELETE like
-            `;
+        if (wasDeleted) {
+          return { result: "Deleted", likeId: "123" };
+        }
 
-            const deleteParams = {
-              authorEmail,
-              postId,
-            };
-
-            await tx.run(deleteQuery, deleteParams);
-
-            const updatePostLikesQuery = `
-              MATCH (p:Post {postId: $postId})
-              SET p.likes = p.likes - 1
-              RETURN p.likes
-            `;
-
-            const updatePostLikesParams = {
-              postId,
-            };
-
-            await tx.run(updatePostLikesQuery, updatePostLikesParams);
-          });
-        } else {
-          const result = await session.writeTransaction(async (tx: any) => {
-            const createQuery = `
+        await session.executeWrite(async (transaction) => {
+          const createLikeQuery = `
               MATCH (a:User {email: $authorEmail})
               MATCH (b:Post {postId: $postId})
               CREATE (c:Like {
-                likeId: randomUUID()                  
-              })-[:USER, :POST]->(a, b)
+                likeId: randomUUID()
+              })-[:USER]->(a), (c)-[:POST]->(b)
               RETURN c
             `;
 
-            const createParams = {
-              postId,
-              authorEmail,
-            };
+          const createLikeParams = {
+            authorEmail,
+            postId,
+          };
 
-            await tx.run(createQuery, createParams);
+          const likeResult = await transaction.run(
+            createLikeQuery,
+            createLikeParams
+          );
+          const likeNode = likeResult.records[0].get("c");
 
-            const updatePostLikesQuery = `
+          const addLikeToPostQuery = `
               MATCH (p:Post {postId: $postId})
-              SET p.likes = p.likes + 1
-              RETURN p.likes
+              MATCH (c:Like {likeId: $likeId})
+              CREATE (c)-[:LIKE]->(p)
+              RETURN c
             `;
 
-            const updatePostLikesParams = {
-              postId,
-            };
+          const addLikeToPostParams = {
+            postId,
+            likeId: likeNode.properties.likeId,
+          };
 
-            const updateResult = await tx.run(
-              updatePostLikesQuery,
-              updatePostLikesParams
-            );
-            const newLikesCount = updateResult.records[0].get("p.likes");
+          const likeWithRelationResult = await transaction.run(
+            addLikeToPostQuery,
+            addLikeToPostParams
+          );
 
-            return { likes: newLikesCount };
-          });
+          const likeWithRelationNode =
+            likeWithRelationResult.records[0].get("c");
 
-          return result;
-        }
+          likeWithRelationNode.properties.author = likeNode.properties.author;
+        });
+
+        return { result: "Created", likeId: "123" };
       } finally {
         session.close();
       }
