@@ -10,12 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/server": "^4.9.1",
     "@neo4j/graphql": "^3.24.1",
     "apollo-server": "^3.12.0",
     "apollo-server-core": "^3.12.0",
     "apollo-server-express": "^3.12.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "firebase": "^10.1.0",
+    "firebase-admin": "^11.10.1",
     "graphql": "^16.7.1",
     "graphql-upload-minimal": "^1.5.5",
     "neo4j-driver": "^5.11.0"

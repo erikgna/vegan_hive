@@ -1,23 +1,42 @@
 import { useState } from 'react';
 
 import { Modal } from './Modal'
+import { gql, useMutation } from '@apollo/client';
+import { auth } from '../../firebase';
 
 interface NewPostProps {
     changeShowNewPostModal: () => void;
 }
 
+const CREATE_POST = gql`  
+    mutation CreatePost($input: CreatePostInput!) {
+        createPost(input: $input) {
+            content,            
+            author {
+                userId
+            }
+        }
+    }
+`
+
 export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
     const [description, setDescription] = useState<string>('')
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
+    const [postPost] = useMutation(CREATE_POST);
 
-    const handleSubmit = () => { }
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setSelectedImage(URL.createObjectURL(file));
-        }
-    };
+        postPost({
+            variables: {
+                input: {
+                    content: description,
+                    authorEmail: auth.currentUser?.email,
+                    file: selectedImage
+                }
+            }
+        })
+    }
 
     return (
         <>
@@ -32,7 +51,7 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
                             </label>
                             <div className="bg-gray-100 border border-dashed border-gray-400 text-center p-8 cursor-pointer hover:bg-gray-200 dark:bg-black dark:hover:bg-gray-900 transition-all duration-300">
                                 {selectedImage ? (
-                                    <img src={selectedImage} alt="Preview" className="mx-auto h-full w-full object-contain" />
+                                    <img src={URL.createObjectURL(selectedImage)} alt="Preview" className="mx-auto h-full w-full object-contain" />
                                 ) : (
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +78,7 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
                                     id="image"
                                     name="image"
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    onChange={handleImageUpload}
+                                    onChange={(e) => setSelectedImage(e.target.files?.[0])}
                                 />
                             </div>
                         </div>
@@ -75,12 +94,11 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
                                 required
                             />
                         </div>
+                        <div className="w-full flex justify-center">
+                            <button type='submit' className="w-full font-semibold py-2 bg-yellow-500 text-white focus:outline-none border-yellow-300 hover:bg-yellow-700 mr-2 transition-all duration-300">Create Post</button>
+                            <button onClick={changeShowNewPostModal} className="w-full font-semibold border py-2 text-yellow-500 hover:text-yellow-300 border-yellow-500 focus:outline-none border-yellow-300 transition-all duration-300">Cancel</button>
+                        </div>
                     </form>
-
-                    <div className="w-full flex justify-center">
-                        <button className="w-full font-semibold py-2 bg-yellow-500 text-white focus:outline-none border-yellow-300 hover:bg-yellow-700 mr-2 transition-all duration-300">Create Post</button>
-                        <button onClick={changeShowNewPostModal} className="w-full font-semibold border py-2 text-yellow-500 hover:text-yellow-300 border-yellow-500 focus:outline-none border-yellow-300 transition-all duration-300">Cancel</button>
-                    </div>
                 </div>
             </Modal>
         </>

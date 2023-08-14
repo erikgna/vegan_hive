@@ -6,6 +6,7 @@ export interface IPost {
   content: string;
   date: string;
   likes: number;
+  imagePath: string;
   comments: IComment[];
   author: IUser;
 }

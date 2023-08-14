@@ -7,8 +7,7 @@ export const typeDefs = gql`
     userId: ID! @id
     username: String!
     email: String!
-    token: String!
-    iconPath: String!
+    iconPath: String
   }
 
   type Post {
@@ -16,8 +15,9 @@ export const typeDefs = gql`
     content: String!
     imagePath: String!
     author: User! @relationship(type: "AUTHOR", direction: IN)
-    likes: Int
+    likes: Int!
     comments: [Comment!]! @relationship(type: "COMMENT", direction: IN)
+    date: Date!
   }
 
   type Comment {
@@ -40,22 +40,30 @@ export const typeDefs = gql`
 
   input CreateCommentInput {
     content: String!
-    authorId: ID!
+    authorEmail: String!
+    postId: ID!
+  }
+
+  input CreateUserInput {
+    username: String!
+    email: String!
+    iconPath: String
   }
 
   input CreatePostInput {
-    title: String!
     content: String!
-    authorId: ID!
+    authorEmail: String!
+    file: Upload!
   }
 
   input LikePostInput {
     postId: ID!
-    userId: ID!
+    authorEmail: String!
   }
 
   type Mutation {
     createComment(input: CreateCommentInput!): Comment
+    createUser(input: CreateUserInput!): User
     createPost(input: CreatePostInput!): Post
     likePost(input: LikePostInput!): Like
     singleUpload(file: Upload!): File!

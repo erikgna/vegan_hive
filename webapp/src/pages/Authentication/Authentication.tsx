@@ -33,7 +33,7 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
         } else if ((formData.username === '' || formData.confirmPassword === '') && !isLogin) {
             setErrorMessage('Fill in all fields')
         }
-        else if (formData.confirmPassword !== formData.password) {
+        else if (formData.confirmPassword !== formData.password && !isLogin) {
             setErrorMessage('Passwords do not match')
         }
 

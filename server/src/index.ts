@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import http from "http";
 import { graphqlUploadExpress } from "graphql-upload-minimal";
 import express from "express";
+import { startStandaloneServer } from "@apollo/server/standalone";
 import {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageLocalDefault,
@@ -12,6 +13,7 @@ import {
 
 import { typeDefs } from "./schemas";
 import { resolvers } from "./resolvers";
+import { GraphQLError } from "graphql";
 
 dotenv.config();
 
@@ -28,19 +30,24 @@ const startApolloServer = async () => {
 
   app.use("/public", express.static("public"));
   app.use(graphqlUploadExpress({ maxFileSize: 6000000, maxFiles: 1 }));
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   const schema = await neoSchema.getSchema();
 
   const server = new ApolloServer({
     schema,
     cache: "bounded",
-    csrfPrevention: true,
+    csrfPrevention: false,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
+    context: ({ req }) => {
+      const token = req.headers.authorization || "";
+
+      return {
+        firebaseId: token,
+      };
+    },
   });
 
   await server.start();
