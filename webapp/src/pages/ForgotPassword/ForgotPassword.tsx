@@ -19,10 +19,7 @@ export const ForgotPassword = () => {
         setLoading(true)
         sendPasswordResetEmail(auth, email)
             .then((_) => setFeedback({ msg: "Email sent successfuly!", type: FeedbackTypes.SUCCESS }))
-            .catch((error) => {
-                console.log(error.code)
-                setFeedback({ msg: errorMessages[error.code], type: FeedbackTypes.ERROR })
-            })
+            .catch((error) => setFeedback({ msg: errorMessages[error.code], type: FeedbackTypes.ERROR }))
             .finally(() => setLoading(false))
     }
 

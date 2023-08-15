@@ -15,11 +15,11 @@ export const resolvers = {
       try {
         const hasLike = await session.executeRead(async (tx) => {
           const query = `
-        MATCH (:Post {postId: $postId})--(like:Like)
-        MATCH (:User {email: $authorEmail})--(like2:Like)
-        WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
-        RETURN [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
-      `;
+            MATCH (:Post {postId: $postId})--(like:Like)
+            MATCH (:User {email: $authorEmail})--(like2:Like)
+            WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
+            RETURN [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
+        `;
           const params = {
             postId,
             authorEmail,
@@ -66,6 +66,24 @@ export const resolvers = {
           );
           const commentNode = commentResult.records[0].get("c");
 
+          // Query read user with email
+          const readUserQuery = `
+            MATCH (u:User {email: $authorEmail})
+            RETURN u
+            `;
+
+          const readUserParams = {
+            authorEmail,
+          };
+
+          const userResult = await transaction.run(
+            readUserQuery,
+            readUserParams
+          );
+
+          const userNode = userResult.records[0].get("u");
+          commentNode.properties.author = userNode.properties;
+          console.log(userNode.properties);
           const addCommentToPostQuery = `
             MATCH (p:Post {postId: $postId})
             MATCH (c:Comment {commentId: $commentId})
@@ -217,6 +235,17 @@ export const resolvers = {
         });
 
         if (wasDeleted) {
+          const decrementLikesQuery = `
+              MATCH (p:Post {postId: $postId})
+              SET p.likes = p.likes - 1
+              RETURN p
+        `;
+
+          const decrementLikesParams = {
+            postId,
+          };
+
+          await session.run(decrementLikesQuery, decrementLikesParams);
           return { result: "Deleted", likeId: "123" };
         }
 
@@ -262,6 +291,18 @@ export const resolvers = {
             likeWithRelationResult.records[0].get("c");
 
           likeWithRelationNode.properties.author = likeNode.properties.author;
+
+          const incrementLikesQuery = `
+            MATCH (p:Post {postId: $postId})
+            SET p.likes = p.likes + 1
+            RETURN p
+        `;
+
+          const incrementLikesParams = {
+            postId,
+          };
+
+          await transaction.run(incrementLikesQuery, incrementLikesParams);
         });
 
         return { result: "Created", likeId: "123" };

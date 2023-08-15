@@ -8,7 +8,6 @@ import { ConstRoutes } from "./constants/Routes";
 import { ForgotPassword } from "./pages/ForgotPassword/ForgotPassword";
 import { NotFound } from "./pages/NotFound";
 import { useEffect } from "react";
-import { auth } from "../firebase";
 
 export const App = () => {
   useEffect(() => {
@@ -19,20 +18,12 @@ export const App = () => {
   });
 
   useEffect(() => {
-    console.log(localStorage.getItem("user"));
-
-    // if (
-    //   !auth.currentUser &&
-    //   (
-    //     [
-    //       ConstRoutes.FORGOT_PASSWORD,
-    //       ConstRoutes.REGISTER,
-    //       ConstRoutes.LOGIN,
-    //     ] as string[]
-    //   ).includes(window.location.pathname)
-    // ) {
-    //   window.location.replace(ConstRoutes.LOGIN);
-    // }
+    if (localStorage.getItem("user") == null &&
+      !([ConstRoutes.FORGOT_PASSWORD,
+      ConstRoutes.REGISTER,
+      ConstRoutes.LOGIN] as string[]).includes(window.location.pathname)) {
+      window.location.replace(ConstRoutes.LOGIN);
+    };
   }, []);
 
   return (
