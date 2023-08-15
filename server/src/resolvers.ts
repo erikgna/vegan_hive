@@ -34,6 +34,23 @@ export const resolvers = {
         return hasLike;
       } catch (error) {}
     },
+    getRecentPosts: async (_: any, args: any) => {
+      console.log("etetse");
+      const session = driver.session();
+      const hasLike = await session.executeRead(async (tx) => {
+        const query = `
+        MATCH (n:Post {content: 'teste'})
+        RETURN n
+      `;
+
+        const result = await tx.run(query);
+        const commonLikes = result.records[0].get("n");
+
+        return commonLikes;
+      });
+
+      return hasLike;
+    },
   },
 
   Mutation: {
@@ -83,7 +100,7 @@ export const resolvers = {
 
           const userNode = userResult.records[0].get("u");
           commentNode.properties.author = userNode.properties;
-          console.log(userNode.properties);
+
           const addCommentToPostQuery = `
             MATCH (p:Post {postId: $postId})
             MATCH (c:Comment {commentId: $commentId})
@@ -195,8 +212,8 @@ export const resolvers = {
           };
 
           await tx.run(updateQuery, updateParams);
-
-          return { properties, filePath };
+          console.log(properties);
+          return properties;
         });
 
         return result;

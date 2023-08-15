@@ -4,20 +4,22 @@ import likeIconDark from "../assets/icons/heart-regular-dark.svg";
 
 interface LikeButtonProps {
     isLiked: boolean;
+    handleLikePost: () => void;
 }
 
-export const LikeButton = ({ isLiked }: LikeButtonProps) => {
-    if (isLiked) {
-        return <img className="w-6 h-6" src={likedIcon} alt="like button" />
-    } else {
-        return <img
-            className="w-6 h-6"
-            src={
-                window.localStorage.getItem("theme")?.includes("dark")
-                    ? likeIconWhite
-                    : likeIconDark
-            }
-            alt="like button"
-        />
-    }
+export const LikeButton = ({ isLiked, handleLikePost }: LikeButtonProps) => {
+    return <button onClick={handleLikePost} className="mr-2">
+        {isLiked ?
+            <img className="w-6 h-6" src={likedIcon} alt="like button" />
+            :
+            <img
+                className="w-6 h-6"
+                src={
+                    window.localStorage.getItem("theme")?.includes("dark")
+                        ? likeIconWhite
+                        : likeIconDark
+                }
+                alt="like button"
+            />}
+    </button >
 }

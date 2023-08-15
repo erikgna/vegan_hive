@@ -70,6 +70,7 @@ export const typeDefs = gql`
 
   type Query {
     checkIfUserLikedPost(postId: ID!, authorEmail: String!): Boolean!
+    getRecentPosts: [Post!]!
   }
 
   type Mutation {
