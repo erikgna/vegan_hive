@@ -1,19 +1,53 @@
-# Rodando um Servidor Node.js e um Aplicativo React com Vite
+# Running the Vegan Hive Application
 
-Este guia irá orientá-lo através dos passos necessários para configurar e executar um servidor Node.js junto com um aplicativo React desenvolvido com Vite.
+This guide will walk you through the necessary steps to set up and run a Node.js server along with a React application developed using Vite.
 
-## Requisitos
+## Requirements
 
-- Node.js instalado (versão 14 ou superior)
-- npm (geralmente instalado junto com o Node.js)
+- Installed Node.js (version 14 or higher)
+- npm (usually installed along with Node.js)
 - Docker
 
-## Passos
+## Steps
 
-### 1. Configurando o Servidor Node.js
+### 0. Running with Docker (recommended)
 
-1. Navegue até o diretório do servidor:
+1. Create the database, server, and web application with a single command in the root folder:
 
 ```bash
-cd cd ser
+docker compose up -d
 ```
+
+## If you prefer not to use Docker, follow the steps below
+
+### 1. Setting up the Neo4J Database
+
+1. Create the database using a Docker container:
+
+```bash
+docker run --restart always --publish=7474:7474 --publish=7687:7687 --env NEO4J_AUTH=neo4j/<password> --volume=/data:/data --volume=/logs:/logs neo4j:5.10.0
+```
+
+### 2. Configuring the Node.js Server
+
+1. Navigate to the server directory:
+
+```bash
+cd server
+npm i
+npm run start:dev
+```
+
+2. Don't forget to configure the environment variables for your case.
+
+### 3. Configuring ReactJS
+
+1. Navigate to the webapp directory:
+
+```bash
+cd webapp
+npm i
+npm run dev
+```
+
+2. Don't forget to configure the environment variables for your case.
