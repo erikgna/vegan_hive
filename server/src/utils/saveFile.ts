@@ -32,7 +32,7 @@ export const saveFile = async (file: any, userPath: string) => {
 
     readStream.pipe(writeStream);
 
-    return filePath.replace("\\", "/");
+    return filePath.replace(/\\/g, "/");
   } catch (error) {
     console.log(error);
   }

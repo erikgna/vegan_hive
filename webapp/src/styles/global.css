@@ -16,3 +16,8 @@
 .max-post-width {
   max-width: 600px;
 }
+
+.place-pattern {
+  background-color: rgb(255, 248, 236);
+  background-image: url("../assets/images/place-pattern.svg");
+}

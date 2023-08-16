@@ -1,0 +1,56 @@
+version: "3"
+
+name: vegan_hive
+
+networks:
+  web:
+    external: true
+
+services:
+  neo4j_container:
+    image: neo4j:latest
+    container_name: neo4j_container
+    environment:
+      NEO4J_AUTH: neo4j/12345678
+    ports:
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt
+    volumes:
+      - ./data:/data
+  vegan_hive_server:
+    image: ./server
+    container_name: vegan_hive_server
+    restart: always
+    ports:
+      - "4000:4000"
+    depends_on:
+      - neo4j_container
+    environment:
+      - NEO4J_URI=neo4j://neo4j_container:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=12345678
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.veganhiveserver.rule=Host(`veganhiveserver.erikna.com`)"
+      - "traefik.http.routers.veganhiveserver.entrypoints=web, websecure"
+      - "traefik.http.routers.veganhiveserver.tls=true"
+      - "traefik.http.routers.veganhiveserver.tls.certresolver=production"
+  vegan_hive_webapp:
+    build: ./webapp
+    container_name: vegan_hive_webapp
+    depends_on:
+      - vegan_hive_server
+    ports:
+      - "8013:8013"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.veganhive.rule=Host(`veganhive.erikna.com`)
+      - traefik.http.routers.veganhive.entrypoints=web, websecure
+      - traefik.http.routers.veganhive.tls=true
+      - traefik.http.services.veganhive.loadbalancer.server.port=8013
+      - traefik.http.routers.veganhive.tls.certresolver=production
+    networks:
+      - web
+    restart: always

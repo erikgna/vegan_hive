@@ -8,25 +8,22 @@ export const POST_IS_LIKED = gql`
 
 export const QUERY_POSTS = gql`
   query Query($page: Int!) {
-    getRecentPosts(page: $page) {
+    getRecentPosts(page: $page) {      
       postId
       content
       imagePath
       likes
       date
-      comments {
-        commentId
+      comments {        
         content
         date
-        author {
-          userId
+        author {          
           username
           iconPath
           email
         }
       }
-      author {
-        userId
+      author {        
         username
         email
         iconPath

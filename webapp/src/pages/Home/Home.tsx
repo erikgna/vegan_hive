@@ -37,7 +37,7 @@ export const Home = () => {
   if (currentPosts.length === 0) return <Loading />;
 
   return (
-    <section className="w-full min-h-screen flex justify-center pb-8 dark:bg-black pl-[256px]">
+    <section onClick={() => console.log(currentPosts)} className="w-full min-h-screen flex justify-center pb-8 dark:bg-black pl-[256px]">
       <div className="flex flex-col align-center max-post-width">
         <InfiniteScroll
           dataLength={currentPosts.length}

@@ -47,13 +47,13 @@ export const Profile = () => {
                         <div className='w-[310px]'>
                             <div className="rounded-full overflow-hidden w-40 h-40">
                                 <img
-                                    src={profileData.iconPath === null ? defaultAvatar : `${BASE_URL}/${profileData.iconPath}`}
+                                    src={profileData.iconPath === null ? defaultAvatar : `${BASE_URL}${profileData.iconPath}`}
                                     alt={profileData.username}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                         </div>
-                        <div>
+                        <div className='dark:text-white'>
                             {/* Mostrará o nome da pessoa e um botão de seguir ao lado */}
                             <div className="flex items-center">
                                 <h2 className="text-lg font-semibold">{profileData.username}</h2>
@@ -81,7 +81,7 @@ export const Profile = () => {
                     </div>
                 </div>
                 <div className="w-full border-t mt-8 mb-2"></div>
-                <h2 className="text-lg font-semibold mb-4">Posts</h2>
+                <h2 className="text-lg font-semibold mb-4 dark:text-white">Posts</h2>
                 <div className="max-w-[940px]">
                     <div className="grid grid-cols-3 gap-2">
                         {posts.data.getUserPosts.map((post: IPost) => (

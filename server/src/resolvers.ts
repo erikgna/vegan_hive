@@ -43,32 +43,45 @@ export const resolvers = {
       try {
         const recentPosts = await session.executeRead(async (tx) => {
           const query = `
-          MATCH (p:Post)-[:AUTHOR]->(u:User)
-RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
-       u.userId AS authorId, u.username AS authorUsername, u.email AS authorEmail,
-       p.likes AS likes, p.comments AS comments, p.allLikes AS allLikes,
-       p.date AS date
-          ORDER BY date DESC
-          SKIP ${skip}
-          LIMIT ${size}
-            `;
+            MATCH (p:Post)-[:AUTHOR]->(u:User)
+            RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath, p.date AS date, p.likes as likes,
+                  u.username AS authorUsername, u.email AS authorEmail, u.iconPath as iconPath            
+            ORDER BY date DESC
+            SKIP ${skip}
+            LIMIT ${size}
+          `;
 
           const result = await tx.run(query);
           const recentPosts = [];
 
           for (const record of result.records) {
+            const comments = await tx.run(
+              `
+                MATCH (p:Post)--(m:Comment)-[:AUTHOR]->(u:User)
+                WHERE p.postId = '${record.get("postId")}'
+                RETURN m.date as date, m.content as content, u.username as username, u.email as email, u.iconPath as iconPath
+              `
+            );
+
             const post = {
               postId: record.get("postId"),
               content: record.get("content"),
               imagePath: record.get("imagePath"),
               likes: record.get("likes"),
-              comments: record.get("comments") ?? [],
-              allLikes: record.get("allLikes") ?? [],
+              comments: comments.records.map((comment) => ({
+                content: comment.get("content"),
+                date: comment.get("date"),
+                author: {
+                  username: comment.get("username"),
+                  email: comment.get("email"),
+                  iconPath: comment.get("iconPath"),
+                },
+              })),
               date: record.get("date"),
               author: {
-                userId: record.get("authorId"),
                 username: record.get("authorUsername"),
                 email: record.get("authorEmail"),
+                iconPath: record.get("iconPath"),
               },
             };
             recentPosts.push(post);
@@ -450,8 +463,7 @@ RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
     editUser: async (_: any, args: any, context: any) => {
       const { email, username, description, file } = args.input;
 
-      // const userInfo = await verifyToken(context.firebaseId);
-      const userInfo = { user_id: "1" };
+      const userInfo = await verifyToken(context.firebaseId);
       const session = driver.session();
 
       try {
@@ -472,7 +484,7 @@ RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
         const result = await session.executeWrite(async (tx: any) => {
           const query = `
             MATCH (a:User {email: $email})
-            SET a.username = $username, a.description = $description
+            SET a.username = $username, a.description = $description${pathQuery}
             RETURN a
           `;
 

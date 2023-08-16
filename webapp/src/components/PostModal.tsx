@@ -80,13 +80,14 @@ export const PostModal = ({ post, postIsLiked, changeModal }: PostModalPrps) => 
                             >
                                 <div className="flex items-center mb-2">
                                     <img
-                                        src={comment.author.iconPath ?? defaultAvatar}
+                                        src={comment.author.iconPath === null ? defaultAvatar : `${BASE_URL}${comment.author.iconPath}`}
                                         alt="User Avatar"
                                         className="w-8 h-8 rounded-full mr-2"
                                     />
-                                    <span className="text-gray-600 text-sm font-semibold dark:text-white">
-                                        {statePost.author.username} - <span className='font-normal text-xs'>{formatDateString(comment.date)}</span>
-                                    </span>
+                                    <div className='flex flex-col'>
+                                        <span className="text-gray-600 text-md font-semibold dark:text-white">{statePost.author.username}</span>
+                                        <span className='text-gray-500 font-normal text-xs'>{formatDateString(comment.date)}</span>
+                                    </div>
                                 </div>
                                 <span className="text-gray-600 text-sm dark:text-gray-300">{comment.content}</span>
                             </div>

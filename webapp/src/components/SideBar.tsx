@@ -13,12 +13,23 @@ import plusIcon from '../assets/icons/plus-solid.svg';
 import sunIcon from '../assets/icons/moon-regular.svg';
 import moonIcon from '../assets/icons/sun-regular.svg';
 import { auth } from '../../firebase';
+import { QUERY_PROFILE } from '../apollo';
+import { useQuery } from '@apollo/client';
+
+import defaultAvatar from "../assets/images/default_avatar.png";
+import { BASE_URL } from '../constants/Url';
 
 export const SideBar = () => {
     const location = useLocation();
     const [current, setCurrent] = useState<string>(location.pathname);
     const [showSignOutModal, setShowSignOutModal] = useState<boolean>(false)
     const [showNewPostModal, setShowNewPostModal] = useState<boolean>(false)
+
+    const { data, loading } = useQuery(QUERY_PROFILE, {
+        variables: {
+            email: JSON.parse(localStorage.getItem('user') ?? '')['email']
+        }
+    });
 
     const changeCurrentRoute = (path: string) => setCurrent(path);
 
@@ -52,6 +63,16 @@ export const SideBar = () => {
         return null;
     }
 
+    // useEffect(() => {
+    //     const profile = localStorage.getItem('profile')
+
+    //     if (!profile) {
+    //         getProfile()
+    //         if (data)
+    //             localStorage.setItem('profile', JSON.stringify(data.getProfileInformation))
+    //     }
+    // }, [data])
+    console.log(data)
     return (
         <aside className='flex flex-col justify-between fixed inset-0 bg-white w-64 h-full border-r border-grey-500 pt-4 dark:bg-black dark:border-gray-800'>
             {showSignOutModal &&
@@ -83,7 +104,7 @@ export const SideBar = () => {
                     <li>
                         <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
                             <img
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/President_Barack_Obama.jpg/245px-President_Barack_Obama.jpg"
+                                src={loading ? defaultAvatar : data.getProfileInformation === null ? defaultAvatar : `${BASE_URL}${data.getProfileInformation.iconPath}`}
                                 alt="User Avatar"
                                 className="w-8 h-8 rounded-full"
                             />

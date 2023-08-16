@@ -108,7 +108,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
             <Link to={`/profile/${statePost.author.email}`}>
                 <div className="flex items-center mb-4">
                     <img
-                        src={statePost.author.iconPath === null ? defaultAvatar : `${BASE_URL}/${statePost.author.iconPath}`}
+                        src={statePost.author.iconPath === null ? defaultAvatar : `${BASE_URL}${statePost.author.iconPath}`}
                         alt="User Avatar"
                         className="w-10 h-10 rounded-full mr-2"
                     />
