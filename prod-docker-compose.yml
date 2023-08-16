@@ -38,11 +38,12 @@ services:
     networks:
       - web
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.veganhiveserver.rule=Host(`veganhiveserver.erikna.com`)"
-      - "traefik.http.routers.veganhiveserver.entrypoints=web, websecure"
-      - "traefik.http.routers.veganhiveserver.tls=true"
-      - "traefik.http.routers.veganhiveserver.tls.certresolver=production"
+      - traefik.enable=true
+      - traefik.http.routers.veganhiveserver.rule=Host(`veganhiveserver.erikna.com`)
+      - traefik.http.routers.veganhiveserver.entrypoints=web, websecure
+      - traefik.http.routers.veganhiveserver.tls=true
+      - traefik.http.services.veganhiveserver.loadbalancer.server.port=4000
+      - traefik.http.routers.veganhiveserver.tls.certresolver=production
   vegan_hive_webapp:
     build: ../webapp
     container_name: vegan_hive_webapp
@@ -55,7 +56,6 @@ services:
       - traefik.http.routers.veganhive.rule=Host(`veganhive.erikna.com`)
       - traefik.http.routers.veganhive.entrypoints=web, websecure
       - traefik.http.routers.veganhive.tls=true
-      - traefik.http.services.veganhive.loadbalancer.server.port=8013
       - traefik.http.routers.veganhive.tls.certresolver=production
     environment:
       - SERVER_URL=https://veganhiveserver.erikna.com/
