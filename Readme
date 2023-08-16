@@ -1,1 +1,19 @@
-- Remember to add contraints using Cypher 
+# Rodando um Servidor Node.js e um Aplicativo React com Vite
+
+Este guia irá orientá-lo através dos passos necessários para configurar e executar um servidor Node.js junto com um aplicativo React desenvolvido com Vite.
+
+## Requisitos
+
+- Node.js instalado (versão 14 ou superior)
+- npm (geralmente instalado junto com o Node.js)
+- Docker
+
+## Passos
+
+### 1. Configurando o Servidor Node.js
+
+1. Navegue até o diretório do servidor:
+
+```bash
+cd cd ser
+```

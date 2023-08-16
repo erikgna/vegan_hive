@@ -19,13 +19,13 @@ export const Profile = () => {
 
     const posts = useQuery(QUERY_USER_POSTS, {
         variables: {
-            authorEmail: email ?? JSON.parse(localStorage.getItem('user') ?? '')['email']
+            authorEmail: email ?? JSON.parse(localStorage.getItem('user') ?? '{}')['email']
         }
     });
 
     const profile = useQuery(QUERY_PROFILE, {
         variables: {
-            email: email ?? JSON.parse(localStorage.getItem('user') ?? '')['email']
+            email: email ?? JSON.parse(localStorage.getItem('user') ?? '{}')['email']
         }
     });
 

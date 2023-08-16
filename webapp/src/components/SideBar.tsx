@@ -27,7 +27,7 @@ export const SideBar = () => {
 
     const { data, loading } = useQuery(QUERY_PROFILE, {
         variables: {
-            email: JSON.parse(localStorage.getItem('user') ?? '')['email']
+            email: JSON.parse(localStorage.getItem('user') ?? '{}')['email']
         }
     });
 
@@ -63,16 +63,6 @@ export const SideBar = () => {
         return null;
     }
 
-    // useEffect(() => {
-    //     const profile = localStorage.getItem('profile')
-
-    //     if (!profile) {
-    //         getProfile()
-    //         if (data)
-    //             localStorage.setItem('profile', JSON.stringify(data.getProfileInformation))
-    //     }
-    // }, [data])
-    console.log(data)
     return (
         <aside className='flex flex-col justify-between fixed inset-0 bg-white w-64 h-full border-r border-grey-500 pt-4 dark:bg-black dark:border-gray-800'>
             {showSignOutModal &&

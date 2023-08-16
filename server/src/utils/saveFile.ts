@@ -1,6 +1,5 @@
 import path, { resolve } from "path";
 import fs, { createWriteStream, mkdir, unlink } from "fs";
-import { finished } from "stream";
 
 export const saveFile = async (file: any, userPath: string) => {
   try {
@@ -37,6 +36,3 @@ export const saveFile = async (file: any, userPath: string) => {
     console.log(error);
   }
 };
-
-// userId / profile / photo;
-// userId / posts / idPost / photo;

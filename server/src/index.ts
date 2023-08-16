@@ -5,15 +5,14 @@ import dotenv from "dotenv";
 import http from "http";
 import { graphqlUploadExpress } from "graphql-upload-minimal";
 import express from "express";
-import { startStandaloneServer } from "@apollo/server/standalone";
 import {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageLocalDefault,
 } from "apollo-server-core";
+import cors from "cors";
 
 import { typeDefs } from "./schemas";
 import { resolvers } from "./resolvers";
-import { GraphQLError } from "graphql";
 
 dotenv.config();
 
@@ -29,6 +28,11 @@ const startApolloServer = async () => {
   const httpServer = http.createServer(app);
 
   app.use("/public", express.static("public"));
+  app.use(
+    cors<cors.CorsRequest>({
+      origin: [process.env.WEB_DEPLOY_URL!, process.env.WEB_LOCALHOST_URL!],
+    })
+  );
   app.use(graphqlUploadExpress({ maxFileSize: 6000000, maxFiles: 1 }));
 
   const schema = await neoSchema.getSchema();
