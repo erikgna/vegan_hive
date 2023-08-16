@@ -7,7 +7,6 @@ import { Modal } from "./Modal";
 import { formatDateString } from "../utils/dealDate";
 import { BASE_URL } from "../constants/Url";
 import { auth } from "../../firebase";
-import { Loading } from "./Loading";
 import { LikeButton } from "./LikedButton";
 import { PostComment } from "./PostComment";
 import { CREATE_COMMENT, LIKE_POST, POST_IS_LIKED } from "../apollo";
@@ -15,6 +14,7 @@ import { CREATE_COMMENT, LIKE_POST, POST_IS_LIKED } from "../apollo";
 import trashIconDark from "../assets/icons/trash-solid-dark.svg";
 import trashIconWhite from "../assets/icons/trash-solid-white.svg";
 import defaultAvatar from "../assets/images/default_avatar.png";
+import { Link } from "react-router-dom";
 
 interface PostProps {
     post: IPost;
@@ -58,9 +58,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
     };
 
     if (postIsLiked.loading) {
-        return <div>
-            {/* <Loading /> */}
-        </div>
+        return <></>
     }
 
     const handleLikePost = () => {
@@ -107,19 +105,21 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
                     </div>
                 </Modal>
             )}
-            <div className="flex items-center mb-4">
-                <img
-                    src={statePost.author.iconPath ?? defaultAvatar}
-                    alt="User Avatar"
-                    className="w-10 h-10 rounded-full mr-2"
-                />
-                <span className="text-gray-700 text-lg font-semibold dark:text-white">
-                    {statePost.author.username} -{" "}
-                    <span className="font-normal text-sm">
-                        {formatDateString(statePost.date)}
+            <Link to={`/profile/${statePost.author.email}`}>
+                <div className="flex items-center mb-4">
+                    <img
+                        src={statePost.author.iconPath === null ? defaultAvatar : `${BASE_URL}/${statePost.author.iconPath}`}
+                        alt="User Avatar"
+                        className="w-10 h-10 rounded-full mr-2"
+                    />
+                    <span className="text-gray-700 text-lg font-semibold dark:text-white">
+                        {statePost.author.username} -{" "}
+                        <span className="font-normal text-sm">
+                            {formatDateString(statePost.date)}
+                        </span>
                     </span>
-                </span>
-            </div>
+                </div>
+            </Link>
             <p className="text-gray-600 mb-4 dark:text-white">{statePost.content}</p>
             <img
                 src={`${BASE_URL}${statePost.imagePath}`}

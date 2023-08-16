@@ -6,8 +6,9 @@ export const typeDefs = gql`
   type User {
     userId: ID! @id
     username: String!
-    email: String!
+    email: String! @unique
     iconPath: String
+    description: String
   }
 
   type Post {
@@ -49,7 +50,13 @@ export const typeDefs = gql`
   input CreateUserInput {
     username: String!
     email: String!
-    iconPath: String
+  }
+
+  input EditUserInput {
+    email: String!
+    username: String
+    file: Upload
+    description: String
   }
 
   input CreatePostInput {
@@ -70,7 +77,9 @@ export const typeDefs = gql`
 
   type Query {
     checkIfUserLikedPost(postId: ID!, authorEmail: String!): Boolean!
-    getRecentPosts: [Post!]!
+    getRecentPosts(page: Int!): [Post!]!
+    getUserPosts(authorEmail: String!): [Post!]!
+    getProfileInformation(email: String!): User!
   }
 
   type Mutation {
@@ -79,5 +88,6 @@ export const typeDefs = gql`
     createPost(input: CreatePostInput!): Post
     likePost(input: LikePostInput!): LikeResult
     singleUpload(file: Upload!): File!
+    editUser(input: EditUserInput!): User
   }
 `;

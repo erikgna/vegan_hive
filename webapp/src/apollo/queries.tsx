@@ -7,8 +7,8 @@ export const POST_IS_LIKED = gql`
 `;
 
 export const QUERY_POSTS = gql`
-  query Posts {
-    posts {
+  query Query($page: Int!) {
+    getRecentPosts(page: $page) {
       postId
       content
       imagePath
@@ -34,3 +34,43 @@ export const QUERY_POSTS = gql`
     }
   }
 `;
+
+export const QUERY_USER_POSTS = gql`
+  query Query($authorEmail: String!) {
+    getUserPosts(authorEmail: $authorEmail) {
+      postId
+      content
+      imagePath
+      likes
+      date
+      comments {
+        commentId
+        content
+        date
+        author {
+          userId
+          username
+          iconPath
+          email
+        }
+      }
+      author {
+        userId
+        username
+        email
+        iconPath
+      }
+    }
+  }
+`;
+
+export const QUERY_PROFILE = gql`
+  query GetProfileInformation($email: String!) {
+    getProfileInformation(email: $email) {
+      username
+      description
+      iconPath
+    }
+  }
+`;
+

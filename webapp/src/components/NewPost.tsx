@@ -35,9 +35,11 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
     return (
         <>
             <Modal changeModal={changeShowNewPostModal}>
-                <div className="flex flex-col justify-center p-4">
+                <div className="flex flex-col justify-center items-center p-4 min-w-[320px]">
                     <h2 className="text-xl font-semibold mb-2 dark:text-white">New Post</h2>
-                    {loading ? <Loading /> :
+                    {loading ? <div className='mt-8'>
+                        <Loading />
+                    </div> :
                         <form onSubmit={handleSubmit}>
                             <div className="w-full max-w-[700px] mb-4 relative overflow-hidden mt-4 dark:text-white">
                                 <label htmlFor="image" className="block text-sm font-semibold mb-2">

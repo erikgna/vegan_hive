@@ -13,6 +13,8 @@ import { ConstRoutes } from "../../constants/Routes";
 import { auth } from "../../../firebase";
 
 import googleBtn from "../../assets/images/google_btn.png";
+import { ApolloError, useMutation } from "@apollo/client";
+import { CREATE_USER } from "../../apollo";
 
 interface AutheticationProps {
   isLogin: boolean;
@@ -31,7 +33,10 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  const [createUser] = useMutation(CREATE_USER);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMessage("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -51,23 +56,53 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
 
     isLogin
       ? signInWithEmailAndPassword(auth, formData.email, formData.password)
-          .then((_) => {
-            window.localStorage.setItem(
-              "user",
-              JSON.stringify(auth.currentUser)
-            );
-            navigate(ConstRoutes.HOME);
-          })
-          .catch((error) => setErrorMessage(errorMessages[error.code]))
+        .then((_) => {
+          window.localStorage.setItem(
+            "user",
+            JSON.stringify(auth.currentUser)
+          );
+          navigate(ConstRoutes.HOME);
+          window.location.reload()
+        })
+        .catch((error) => setErrorMessage(errorMessages[error.code]))
       : createUserWithEmailAndPassword(auth, formData.email, formData.password)
-          .then((_) => navigate(ConstRoutes.LOGIN))
-          .catch((error) => setErrorMessage(errorMessages[error.code]));
+        .then((_) => {
+          createUser({
+            variables: {
+              input: {
+                username: formData.username,
+                email: formData.email,
+              }
+            }
+          })
+            .then((_) => navigate(ConstRoutes.LOGIN))
+            .catch((_) => setErrorMessage("Error creating user"))
+        })
+        .catch((error) => setErrorMessage(errorMessages[error.code]));
+    setFormData({ ...formData, password: "", confirmPassword: "" })
   };
 
   const googleSignIn = () => {
-    signInWithPopup(auth, provider)
-      .then((_) => navigate(ConstRoutes.HOME))
-      .catch((_) => setErrorMessage("Google sign in failed"));
+    // signInWithPopup(auth, provider)
+    //   .then((result) => {        
+    createUser({
+      variables: {
+        input: {
+          username: 'Gabriel',
+          email: 'thehautd@gmail.com',
+          // username: result.user.displayName,
+          // email: result.user.email,
+        }
+      }
+    }).then(() => {
+      // localStorage.setItem('user', JSON.stringify(result.user))
+      // navigate(ConstRoutes.HOME)
+      // window.location.reload()
+    }).catch((e) => {
+      if (e instanceof ApolloError) console.log(e.message)
+    })
+    // })
+    // .catch((_) => setErrorMessage("Google sign in failed"));
   };
 
   return (

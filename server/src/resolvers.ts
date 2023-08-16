@@ -35,21 +35,130 @@ export const resolvers = {
       } catch (error) {}
     },
     getRecentPosts: async (_: any, args: any) => {
-      console.log("etetse");
+      const { page } = args;
+      const size = 2;
+      const skip = page * size;
+
       const session = driver.session();
-      const hasLike = await session.executeRead(async (tx) => {
-        const query = `
-        MATCH (n:Post {content: 'teste'})
-        RETURN n
-      `;
+      try {
+        const recentPosts = await session.executeRead(async (tx) => {
+          const query = `
+          MATCH (p:Post)-[:AUTHOR]->(u:User)
+RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
+       u.userId AS authorId, u.username AS authorUsername, u.email AS authorEmail,
+       p.likes AS likes, p.comments AS comments, p.allLikes AS allLikes,
+       p.date AS date
+          ORDER BY date DESC
+          SKIP ${skip}
+          LIMIT ${size}
+            `;
 
-        const result = await tx.run(query);
-        const commonLikes = result.records[0].get("n");
+          const result = await tx.run(query);
+          const recentPosts = [];
 
-        return commonLikes;
-      });
+          for (const record of result.records) {
+            const post = {
+              postId: record.get("postId"),
+              content: record.get("content"),
+              imagePath: record.get("imagePath"),
+              likes: record.get("likes"),
+              comments: record.get("comments") ?? [],
+              allLikes: record.get("allLikes") ?? [],
+              date: record.get("date"),
+              author: {
+                userId: record.get("authorId"),
+                username: record.get("authorUsername"),
+                email: record.get("authorEmail"),
+              },
+            };
+            recentPosts.push(post);
+          }
 
-      return hasLike;
+          return recentPosts;
+        });
+
+        return recentPosts;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getUserPosts: async (_: any, args: any) => {
+      const { authorEmail } = args;
+
+      const session = driver.session();
+      try {
+        const recentPosts = await session.executeRead(async (tx) => {
+          const query = `
+          MATCH (p:Post)-[:AUTHOR]->(u:User)
+          WHERE u.email = $authorEmail
+RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
+       u.userId AS authorId, u.username AS authorUsername, u.email AS authorEmail,
+       p.likes AS likes, p.comments AS comments, p.allLikes AS allLikes,
+       p.date AS date
+          ORDER BY date DESC
+            `;
+
+          const result = await tx.run(query, { authorEmail });
+          const recentPosts = [];
+
+          for (const record of result.records) {
+            const post = {
+              postId: record.get("postId"),
+              content: record.get("content"),
+              imagePath: record.get("imagePath"),
+              likes: record.get("likes"),
+              comments: record.get("comments") ?? [],
+              allLikes: record.get("allLikes") ?? [],
+              date: record.get("date"),
+              author: {
+                userId: record.get("authorId"),
+                username: record.get("authorUsername"),
+                email: record.get("authorEmail"),
+              },
+            };
+            recentPosts.push(post);
+          }
+
+          return recentPosts;
+        });
+
+        return recentPosts;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getProfileInformation: async (_: any, args: any) => {
+      const { email } = args;
+
+      const session = driver.session();
+      try {
+        const user = await session.executeRead(async (tx) => {
+          const query = `
+            MATCH (u:User)
+            WHERE u.email = $email
+            RETURN u.username AS username, u.iconPath AS iconPath, u.description AS description
+          `;
+
+          const result = await tx.run(query, { email });
+
+          if (result.records.length === 0) {
+            return null; // Return null if user not found
+          }
+
+          const record = result.records[0];
+          const user = {
+            iconPath: record.get("iconPath"),
+            username: record.get("username"),
+            description: record.get("description"),
+          };
+
+          return user;
+        });
+
+        return user;
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 
@@ -160,8 +269,19 @@ export const resolvers = {
         });
 
         return result;
-      } catch (e) {
-        session.close();
+      } catch (error) {
+        if (
+          (error as any).code ===
+          "Neo.ClientError.Schema.ConstraintValidationFailed"
+        ) {
+          // Verifique se o erro é relacionado à violação de uma restrição única (email duplicado)
+          throw new Error(
+            "Email is already in use. Please choose a different email."
+          );
+        }
+
+        // Se não for um erro de email duplicado, envie uma mensagem genérica
+        throw new Error("Could not create user. Please try again later.");
       } finally {
         session.close();
       }
@@ -231,16 +351,16 @@ export const resolvers = {
       try {
         const wasDeleted = await session.executeWrite(async (tx) => {
           const query = `
-              MATCH (:Post {postId: '4a7659ae-5283-4feb-a81c-6932b3cbc28f'})--(like:Like)
-              MATCH (:User {email: 'erikgnaa@gmail.com'})--(like2:Like)
+              MATCH (:Post {postId: $postId})--(like:Like)
+              MATCH (:User {email: $authorEmail})--(like2:Like)
               WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
               WITH [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
               UNWIND commonLikes AS likeToDelete
               DETACH DELETE likeToDelete
             `;
           const params = {
-            authorEmail,
             postId,
+            authorEmail,
           };
 
           const result = await tx.run(query, params);
@@ -323,6 +443,48 @@ export const resolvers = {
         });
 
         return { result: "Created", likeId: "123" };
+      } finally {
+        session.close();
+      }
+    },
+    editUser: async (_: any, args: any, context: any) => {
+      const { email, username, description, file } = args.input;
+
+      // const userInfo = await verifyToken(context.firebaseId);
+      const userInfo = { user_id: "1" };
+      const session = driver.session();
+
+      try {
+        const params: any = {
+          email,
+          username,
+          description,
+        };
+        var pathQuery = "";
+
+        if (file) {
+          const path = `${userInfo.user_id}/icons`;
+          const filePath = await saveFile(file, path);
+          params["iconPath"] = filePath;
+          pathQuery = ", a.iconPath = $iconPath";
+        }
+
+        const result = await session.executeWrite(async (tx: any) => {
+          const query = `
+            MATCH (a:User {email: $email})
+            SET a.username = $username, a.description = $description
+            RETURN a
+          `;
+
+          const result = await tx.run(query, params);
+          const updatedUser = result.records[0].get("a").properties;
+
+          return updatedUser;
+        });
+
+        return result;
+      } catch (e) {
+        session.close();
       } finally {
         session.close();
       }

@@ -1,6 +1,7 @@
 export enum ConstRoutes {
   HOME = "/",
-  PROFILE = "/profile",
+  MY_PROFILE = "/my-profile",
+  PROFILE = "/profile/:email",
   LOGIN = "/login",
   REGISTER = "/register",
   FORGOT_PASSWORD = "/forgot-password",

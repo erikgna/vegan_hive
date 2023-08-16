@@ -31,3 +31,19 @@ export const LIKE_POST = gql`
     }
   }
 `;
+
+export const EDIT_USER = gql`
+  mutation EditUser($input: EditUserInput!) {
+    editUser(input: $input) {
+      username
+    }
+  }
+`;
+
+export const CREATE_USER = gql`
+  mutation CreateUser($input: CreateUserInput!) {
+    createUser(input: $input) {
+      userId
+    }
+  }
+`;

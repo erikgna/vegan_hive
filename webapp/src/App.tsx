@@ -1,13 +1,13 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Home } from "./pages/Home/Home";
-import { MyPosts } from "./pages/MyPosts/MyPosts";
 import { SideBar } from "./components/SideBar";
 import { Authentication } from "./pages/Authentication/Authentication";
 import { ConstRoutes } from "./constants/Routes";
 import { ForgotPassword } from "./pages/ForgotPassword/ForgotPassword";
 import { NotFound } from "./pages/NotFound";
 import { useEffect } from "react";
+import { Profile } from "./pages/Profile/Profile";
 
 export const App = () => {
   useEffect(() => {
@@ -31,7 +31,8 @@ export const App = () => {
       <SideBar />
       <Routes>
         <Route path={ConstRoutes.HOME} element={<Home />} />
-        <Route path={ConstRoutes.PROFILE} element={<MyPosts />} />
+        <Route path={ConstRoutes.PROFILE} element={<Profile />} />
+        <Route path={ConstRoutes.MY_PROFILE} element={<Profile />} />
 
         <Route
           path={ConstRoutes.LOGIN}

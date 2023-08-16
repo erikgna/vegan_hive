@@ -12,17 +12,18 @@ import powerOffDark from '../assets/icons/power-off-solid-dark.svg';
 import plusIcon from '../assets/icons/plus-solid.svg';
 import sunIcon from '../assets/icons/moon-regular.svg';
 import moonIcon from '../assets/icons/sun-regular.svg';
+import { auth } from '../../firebase';
 
 export const SideBar = () => {
     const location = useLocation();
     const [current, setCurrent] = useState<string>(location.pathname);
-    const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false)
+    const [showSignOutModal, setShowSignOutModal] = useState<boolean>(false)
     const [showNewPostModal, setShowNewPostModal] = useState<boolean>(false)
 
     const changeCurrentRoute = (path: string) => setCurrent(path);
 
-    const changeDeleteModal = () => {
-        setShowDeleteModal(!showDeleteModal)
+    const changeSignOutModal = () => {
+        setShowSignOutModal(!showSignOutModal)
     }
 
     const changeShowNewPostModal = () => {
@@ -40,20 +41,27 @@ export const SideBar = () => {
         window.location.reload();
     }
 
+    const signOut = () => {
+        auth.signOut().then(() => {
+            localStorage.removeItem('user');
+            window.location.replace(ConstRoutes.LOGIN);
+        });
+    }
+
     if (current === ConstRoutes.LOGIN || current === ConstRoutes.FORGOT_PASSWORD || current === ConstRoutes.REGISTER) {
         return null;
     }
 
     return (
         <aside className='flex flex-col justify-between fixed inset-0 bg-white w-64 h-full border-r border-grey-500 pt-4 dark:bg-black dark:border-gray-800'>
-            {showDeleteModal &&
-                <Modal changeModal={changeDeleteModal}>
+            {showSignOutModal &&
+                <Modal changeModal={changeSignOutModal}>
                     <div className="flex flex-col justify-center p-4 text-center">
                         <h2 className="text-xl font-semibold mb-2 dark:text-white">Confirm Sign Out</h2>
                         <p className="text-gray-600 dark:text-white">Are you sure you want to sign out?</p>
                         <div className="w-full flex justify-center mt-6">
-                            <button className="w-full font-semibold py-2 bg-yellow-500 text-white focus:outline-none border-yellow-300 hover:bg-yellow-700 mr-2 transition-all duration-300">Confirm</button>
-                            <button onClick={changeDeleteModal} className="w-full font-semibold border py-2 text-yellow-500 hover:text-yellow-300 border-yellow-500 focus:outline-none border-yellow-300 transition-all duration-300">Cancel</button>
+                            <button onClick={signOut} className="w-full font-semibold py-2 bg-yellow-500 text-white focus:outline-none border-yellow-300 hover:bg-yellow-700 mr-2 transition-all duration-300">Confirm</button>
+                            <button onClick={changeSignOutModal} className="w-full font-semibold border py-2 text-yellow-500 hover:text-yellow-300 border-yellow-500 focus:outline-none border-yellow-300 transition-all duration-300">Cancel</button>
                         </div>
                     </div>
                 </Modal>
@@ -73,7 +81,7 @@ export const SideBar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link onClick={() => changeCurrentRoute(ConstRoutes.PROFILE)} to={ConstRoutes.PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
+                        <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
                             <img
                                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/President_Barack_Obama.jpg/245px-President_Barack_Obama.jpg"
                                 alt="User Avatar"
@@ -95,7 +103,7 @@ export const SideBar = () => {
                     <img className='h-6 w-6 mr-2' src={window.localStorage.getItem('theme')?.includes('dark') ? sunIcon : moonIcon} alt="light toggle" />
                     <span className='font-bold text-yellow-500'>{window.localStorage.getItem('theme')?.includes('dark') ? 'Light mode' : 'Dark mode'}</span>
                 </div>
-                <div onClick={changeDeleteModal} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer dark:text-white transition-all duration-300">
+                <div onClick={changeSignOutModal} className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer dark:text-white transition-all duration-300">
                     <img src={window.localStorage.getItem('theme')?.includes('dark') ? powerOffWhite : powerOffDark} alt='home' className="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" />
                     <span className="ml-3">Logout</span>
                 </div>
