@@ -1,125 +1,111 @@
-import { driver } from "../..";
+import { ogm } from "../..";
 import { AuthUtils } from "../../firebase/auth";
 import { saveFile } from "../../utils/saveFile";
 
 export class UserResolver {
-  getProfileInformation = async (_: any, args: any) => {
-    const { email } = args;
+  saveUserToken = async (_: any, args: any) => {
+    const { token, email } = args.input;
 
-    const session = driver.session();
     try {
-      const user = await session.executeRead(async (tx) => {
-        const query = `
-          MATCH (u:User)
-          WHERE u.email = $email
-          RETURN u.username AS username, u.iconPath AS iconPath, u.description AS description
-        `;
+      await ogm.init();
+      const User = ogm.model("User");
 
-        const result = await tx.run(query, { email });
-
-        if (result.records.length === 0) {
-          return null; // Return null if user not found
-        }
-
-        const record = result.records[0];
-        const user = {
-          iconPath: record.get("iconPath"),
-          username: record.get("username"),
-          description: record.get("description"),
-        };
-
-        return user;
+      const users = await User.update({
+        where: { email: email },
+        update: { token: token },
       });
 
-      return user;
+      if (users.length === 0) {
+        throw new Error("Couldn't authenticate user.");
+      }
+
+      return users[0];
     } catch (error) {
-      console.log(error);
+      throw new Error("Couldn't authenticate user.");
+    }
+  };
+  getProfileInformation = async (_: any, args: any) => {
+    try {
+      await ogm.init();
+      const User = ogm.model("User");
+
+      const users = await User.find({
+        where: { userId: args.userId },
+      });
+
+      if (users.length === 0) {
+        throw new Error("Couldn't find profile.");
+      }
+
+      return users[0];
+    } catch (error) {
+      throw new Error("An error ocurred while retrieving profile information.");
     }
   };
 
-  createUser = async (_: any, args: any, context: any) => {
-    const { username, email } = args.input;
-
-    const session = driver.session();
+  getProfile = async (_: any, args: any) => {
     try {
-      const result = await session.executeWrite(async (tx: any) => {
-        const query = `            
-          CREATE (c:User {
-            userId: randomUUID(),
-            username: $username,
-            email: $email
-          })
-          RETURN c
-        `;
+      await ogm.init();
+      const User = ogm.model("User");
 
-        const params = {
-          username,
-          email,
-        };
-
-        const result = await tx.run(query, params);
-
-        return result.records[0].get("c").properties;
+      const users = await User.find({
+        where: { email: args.email },
       });
 
-      return result;
-    } catch (error) {
-      if (
-        (error as any).code ===
-        "Neo.ClientError.Schema.ConstraintValidationFailed"
-      ) {
-        // Verifique se o erro é relacionado à violação de uma restrição única (email duplicado)
-        throw new Error(
-          "Email is already in use. Please choose a different email."
-        );
+      if (users.length === 0) {
+        throw new Error("Couldn't find profile.");
       }
 
-      // Se não for um erro de email duplicado, envie uma mensagem genérica
-      throw new Error("Could not create user. Please try again later.");
-    } finally {
-      session.close();
+      return users[0];
+    } catch (error) {
+      throw new Error("An error ocurred while retrieving profile information.");
+    }
+  };
+
+  createUser = async (_: any, args: any) => {
+    const { username, email } = args.input;
+
+    try {
+      await ogm.init();
+      const User = ogm.model("User");
+
+      const { users } = await User.create({
+        input: [{ username, email }],
+      });
+
+      return users[0];
+    } catch (error) {
+      throw new Error("Couldn't create user.");
     }
   };
 
   editUser = async (_: any, args: any, context: any) => {
-    const { email, username, description, file } = args.input;
+    const { username, description, file } = args.input;
 
     const userInfo = await AuthUtils.verifyToken(context.firebaseId);
-    const session = driver.session();
-
     try {
-      const params: any = {
-        email,
+      await ogm.init();
+      const User = ogm.model("User");
+
+      const updateParams: any = {
         username,
         description,
       };
-      var pathQuery = "";
 
       if (file) {
         const path = `${userInfo.user_id}/icons`;
         const filePath = await saveFile(file, path);
-        params["iconPath"] = filePath;
-        pathQuery = ", a.iconPath = $iconPath";
+        updateParams["iconPath"] = filePath;
       }
 
-      const result = await session.executeWrite(async (tx: any) => {
-        const query = `
-          MATCH (a:User {email: $email})
-          SET a.username = $username, a.description = $description${pathQuery}
-          RETURN a
-        `;
-
-        const result = await tx.run(query, params);
-        const updatedUser = result.records[0].get("a").properties;
-
-        return updatedUser;
+      const { users } = await User.update({
+        where: { email: userInfo.email },
+        update: updateParams,
       });
 
-      return result;
-    } catch (e) {
-      session.close();
-    } finally {
-      session.close();
+      return users[0];
+    } catch (error) {
+      throw new Error("Couldn't update user.");
     }
   };
 }

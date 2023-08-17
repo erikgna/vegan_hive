@@ -15,7 +15,8 @@ import { auth } from "../../../firebase";
 import community from "../../assets/images/community.png";
 import googleBtn from "../../assets/images/google_btn.png";
 import { ApolloError, useMutation } from "@apollo/client";
-import { CREATE_USER } from "../../apollo";
+import { CREATE_USER, SAVE_USER_TOKEN } from "../../apollo";
+import { Loading } from "../../components/Loading";
 
 interface AutheticationProps {
   isLogin: boolean;
@@ -33,8 +34,10 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
     confirmPassword: "",
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [createUser] = useMutation(CREATE_USER);
+  const [saveUserToken] = useMutation(SAVE_USER_TOKEN);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage("");
@@ -55,15 +58,27 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
       setErrorMessage("Passwords do not match");
     }
 
+    setLoading(true);
     isLogin
       ? signInWithEmailAndPassword(auth, formData.email, formData.password)
-        .then((_) => {
-          localStorage.setItem(
-            "user",
-            JSON.stringify(auth.currentUser)
-          );
-          navigate(ConstRoutes.HOME);
-          window.location.reload()
+        .then(async (auth) => {
+          const idToken = await auth.user?.getIdToken();
+          saveUserToken({
+            variables: {
+              input: {
+                token: idToken ?? "",
+                email: auth.user?.email
+              }
+            }
+          }).then(() => {
+            localStorage.setItem('idToken', idToken ?? "");
+            localStorage.setItem(
+              "user",
+              JSON.stringify(auth.user)
+            );
+            navigate(ConstRoutes.HOME);
+            window.location.reload()
+          });
         })
         .catch((error) => setErrorMessage(errorMessages[error.code]))
       : createUserWithEmailAndPassword(auth, formData.email, formData.password)
@@ -80,7 +95,8 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
             .catch((_) => setErrorMessage("Error creating user"))
         })
         .catch((error) => setErrorMessage(errorMessages[error.code]));
-    setFormData({ ...formData, password: "", confirmPassword: "" })
+    setFormData({ ...formData, password: "", confirmPassword: "" });
+    setLoading(false);
   };
 
   const googleSignIn = () => {
@@ -220,12 +236,12 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
             Forgot you password?
           </Link>
         )}
-        <button
+        {loading ? <div className="flex items-center justify-center w-full"><Loading /></div> : <button
           type="submit"
           className="mt-2 bg-yellow-500 text-white font-semibold py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:ring focus:border-yellow-300 max-w-[700px] w-full"
         >
           {isLogin ? "Login" : "Register"}
-        </button>
+        </button>}
 
         <p className="text-sm mt-2">
           {isLogin

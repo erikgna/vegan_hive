@@ -4,8 +4,7 @@ import { IPost } from '../interfaces/Post';
 
 import defaultAvatar from '../assets/images/default_avatar.png'
 import { BASE_URL } from '../constants/Url';
-import { formatDateString } from '../utils/dealDate';
-import { auth } from '../../firebase';
+import { formatDateString } from '../utils/DealDate';
 import { LikeButton } from './LikedButton';
 import { CREATE_COMMENT, LIKE_POST } from '../apollo';
 import { useMutation } from '@apollo/client';
@@ -34,7 +33,6 @@ export const PostModal = ({ post, postIsLiked, changeModal }: PostModalPrps) => 
         likePost({
             variables: {
                 input: {
-                    authorEmail: auth.currentUser?.email,
                     postId: statePost.postId,
                 },
             },
@@ -50,12 +48,11 @@ export const PostModal = ({ post, postIsLiked, changeModal }: PostModalPrps) => 
             variables: {
                 input: {
                     content: text,
-                    authorEmail: auth.currentUser?.email,
                     postId: statePost.postId,
                 },
             },
         }).then((data) => {
-            setStatePost((prevState) => ({ ...prevState, comments: [...prevState.comments, { ...data.data.createComment }] }))
+            setStatePost((prevState) => ({ ...prevState, comments: [{ ...data.data.createComment }, ...prevState.comments,] }))
         });
     };
 

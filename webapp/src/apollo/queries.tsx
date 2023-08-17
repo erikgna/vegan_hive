@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const POST_IS_LIKED = gql`
-  query Query($postId: ID!, $authorEmail: String!) {
-    checkIfUserLikedPost(postId: $postId, authorEmail: $authorEmail)
+  query Query($postId: ID!) {
+    checkIfUserLikedPost(postId: $postId)
   }
 `;
 
@@ -23,9 +23,9 @@ export const QUERY_POSTS = gql`
           email
         }
       }
-      author {        
-        username
-        email
+      author {
+        userId
+        username        
         iconPath
       }
     }
@@ -33,9 +33,9 @@ export const QUERY_POSTS = gql`
 `;
 
 export const QUERY_USER_POSTS = gql`
-  query Query($authorEmail: String!) {
-    getUserPosts(authorEmail: $authorEmail) {
-      postId
+query Query($userId: ID!) {
+  getUserPosts(userId: $userId){
+    postId
       content
       imagePath
       likes
@@ -53,19 +53,27 @@ export const QUERY_USER_POSTS = gql`
       }
       author {
         userId
-        username
-        email
+        username        
         iconPath
       }
+    }
+}
+`;
+
+export const QUERY_PROFILE = gql`
+  query GetProfileInformation($userId: ID!) {
+    getProfileInformation(userId: $userId) {
+      username
+      description
+      iconPath
     }
   }
 `;
 
-export const QUERY_PROFILE = gql`
-  query GetProfileInformation($email: String!) {
-    getProfileInformation(email: $email) {
-      username
-      description
+export const QUERY_PROFILE_PICTURE = gql`
+  query GetProfile($email: String!) {
+    getProfile(email: $email) {
+      userId
       iconPath
     }
   }

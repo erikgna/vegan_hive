@@ -13,7 +13,7 @@ import plusIcon from '../assets/icons/plus-solid.svg';
 import sunIcon from '../assets/icons/moon-regular.svg';
 import moonIcon from '../assets/icons/sun-regular.svg';
 import { auth } from '../../firebase';
-import { QUERY_PROFILE } from '../apollo';
+import { QUERY_PROFILE_PICTURE } from '../apollo';
 import { useQuery } from '@apollo/client';
 
 import defaultAvatar from "../assets/images/default_avatar.png";
@@ -27,10 +27,8 @@ export const SideBar = () => {
     const [showSignOutModal, setShowSignOutModal] = useState<boolean>(false)
     const [showNewPostModal, setShowNewPostModal] = useState<boolean>(false)
 
-    const { data, loading } = useQuery(QUERY_PROFILE, {
-        variables: {
-            email: JSON.parse(localStorage.getItem('user') ?? '{}')['email']
-        }
+    const { data, loading } = useQuery(QUERY_PROFILE_PICTURE, {
+        variables: { email: JSON.parse(localStorage.getItem('user') ?? '{}')['email'] }
     });
 
     const changeCurrentRoute = (path: string) => setCurrent(path);
@@ -65,6 +63,8 @@ export const SideBar = () => {
         return null;
     }
 
+    localStorage.setItem('userId', data?.getProfile.userId);
+
     return (
         <>
             <aside className='flex px-4 fixed bottom-0 border-t w-full py-4 border-grey-500 dark:bg-black bg-white dark:border-gray-800 sm:hidden'>
@@ -87,7 +87,7 @@ export const SideBar = () => {
                     </Link>
                     <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
                         <img
-                            src={loading ? defaultAvatar : data.getProfileInformation.iconPath === null ? defaultAvatar : `${BASE_URL}${data.getProfileInformation.iconPath}`}
+                            src={loading ? defaultAvatar : data.getProfile.iconPath === null ? defaultAvatar : `${BASE_URL}${data.getProfile.iconPath}`}
                             alt="User Avatar"
                             className="w-8 xl:h-8 h-8 rounded-full"
                         />
@@ -135,7 +135,7 @@ export const SideBar = () => {
                         <li>
                             <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
                                 <img
-                                    src={loading ? defaultAvatar : data.getProfileInformation.iconPath === null ? defaultAvatar : `${BASE_URL}${data.getProfileInformation.iconPath}`}
+                                    src={loading ? defaultAvatar : data.getProfile.iconPath === null ? defaultAvatar : `${BASE_URL}${data.getProfile.iconPath}`}
                                     alt="User Avatar"
                                     className="w-8 xl:h-8 h-6 rounded-full"
                                 />

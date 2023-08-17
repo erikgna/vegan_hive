@@ -1,6 +1,8 @@
 import { ogm } from "../..";
+import { AuthUtils } from "../../firebase/auth";
 export class LikeResolver {
-  checkIfUserLikedPost = async (_: any, args: any) => {
+  checkIfUserLikedPost = async (_: any, args: any, context: any) => {
+    const userInfo = await AuthUtils.verifyToken(context.firebaseId);
     try {
       await ogm.init();
       const Like = ogm.model("Like");
@@ -11,12 +13,12 @@ export class LikeResolver {
             postId: args.postId,
           },
           user: {
-            email: args.authorEmail,
+            email: userInfo.email,
           },
         },
       });
 
-      return likes.length === 0;
+      return likes.length > 0;
     } catch (error) {
       throw new Error(
         "An error ocurred while retrieving like information about the post."
@@ -24,132 +26,52 @@ export class LikeResolver {
     }
   };
 
-  likePost = async (_: any, args: any) => {
-    console.log(args.input.postId, args.input.authorEmail);
-    await ogm.init();
-    const Like = ogm.model("Like");
+  likePost = async (_: any, args: any, context: any) => {
+    const postId = args.input.postId;
 
-    const data = await Like.create({
-      input: [
-        {
-          post: {
-            connect: {
-              where: {
-                postId: args.input.postId,
-              },
-            },
-          },
-          user: {
-            connect: {
-              where: {
-                email: args.input.authorEmail,
-              },
-            },
-          },
+    const userInfo = await AuthUtils.verifyToken(context.firebaseId);
+    try {
+      await ogm.init();
+      const Like = ogm.model("Like");
+      const Post = ogm.model("Post");
+
+      const like = await Like.find({
+        where: {
+          post: { postId },
+          user: { email: userInfo.email },
         },
-      ],
-    });
+      });
 
-    console.log(data);
-    // const { postId, authorEmail } = args.input;
-    // const session = driver.session();
+      const posta = await Post.find({ where: { postId } });
+      await Post.update({
+        where: { postId },
+        update: {
+          likes: like.length > 0 ? posta[0].likes - 1 : posta[0].likes + 1,
+        },
+      });
 
-    // try {
-    //   const wasDeleted = await session.executeWrite(async (tx) => {
-    //     const query = `
-    //         MATCH (:Post {postId: $postId})--(like:Like)
-    //         MATCH (:User {email: $authorEmail})--(like2:Like)
-    //         WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
-    //         WITH [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
-    //         UNWIND commonLikes AS likeToDelete
-    //         DETACH DELETE likeToDelete
-    //       `;
-    //     const params = {
-    //       postId,
-    //       authorEmail,
-    //     };
+      if (like.length > 0) {
+        await Like.delete({
+          where: {
+            post: { postId },
+            user: { email: userInfo.email },
+          },
+        });
+        return { result: "Deleted", likeId: like[0].likeId };
+      }
 
-    //     const result = await tx.run(query, params);
-    //     const counter =
-    //       result.summary.counters.updates().nodesDeleted +
-    //       result.summary.counters.updates().relationshipsDeleted;
+      const { likes } = await Like.create({
+        input: [
+          {
+            post: { connect: { where: { node: { postId } } } },
+            user: { connect: { where: { node: { email: userInfo.email } } } },
+          },
+        ],
+      });
 
-    //     return counter > 0;
-    //   });
-
-    //   if (wasDeleted) {
-    //     const decrementLikesQuery = `
-    //         MATCH (p:Post {postId: $postId})
-    //         SET p.likes = p.likes - 1
-    //         RETURN p
-    //   `;
-
-    //     const decrementLikesParams = {
-    //       postId,
-    //     };
-
-    //     await session.run(decrementLikesQuery, decrementLikesParams);
-    //     return { result: "Deleted", likeId: "123" };
-    //   }
-
-    //   await session.executeWrite(async (transaction) => {
-    //     const createLikeQuery = `
-    //         MATCH (a:User {email: $authorEmail})
-    //         MATCH (b:Post {postId: $postId})
-    //         CREATE (c:Like {
-    //           likeId: randomUUID()
-    //         })-[:USER]->(a), (c)-[:POST]->(b)
-    //         RETURN c
-    //       `;
-
-    //     const createLikeParams = {
-    //       authorEmail,
-    //       postId,
-    //     };
-
-    //     const likeResult = await transaction.run(
-    //       createLikeQuery,
-    //       createLikeParams
-    //     );
-    //     const likeNode = likeResult.records[0].get("c");
-
-    //     const addLikeToPostQuery = `
-    //         MATCH (p:Post {postId: $postId})
-    //         MATCH (c:Like {likeId: $likeId})
-    //         CREATE (c)-[:LIKE]->(p)
-    //         RETURN c
-    //       `;
-
-    //     const addLikeToPostParams = {
-    //       postId,
-    //       likeId: likeNode.properties.likeId,
-    //     };
-
-    //     const likeWithRelationResult = await transaction.run(
-    //       addLikeToPostQuery,
-    //       addLikeToPostParams
-    //     );
-
-    //     const likeWithRelationNode = likeWithRelationResult.records[0].get("c");
-
-    //     likeWithRelationNode.properties.author = likeNode.properties.author;
-
-    //     const incrementLikesQuery = `
-    //       MATCH (p:Post {postId: $postId})
-    //       SET p.likes = p.likes + 1
-    //       RETURN p
-    //   `;
-
-    //     const incrementLikesParams = {
-    //       postId,
-    //     };
-
-    //     await transaction.run(incrementLikesQuery, incrementLikesParams);
-    //   });
-
-    //   return { result: "Created", likeId: "123" };
-    // } finally {
-    //   session.close();
-    // }
+      return { result: "Created", likeId: likes[0].likeId };
+    } catch (error) {
+      throw new Error("Couldn't like post.");
+    }
   };
 }

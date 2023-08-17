@@ -38,7 +38,7 @@ export const Home = () => {
   if (currentPosts.length === 0) return <Loading />;
 
   return (
-    <section onClick={() => console.log(currentPosts)} className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-0 sm:pl-20">
+    <section className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-0 sm:pl-20">
       <div className={`flex flex-col align-center max-post-width ${currentPosts.length === 0 && 'justify-center'}`}>
         {currentPosts.length === 0 &&
           <div className="flex flex-col items-center justify-center">

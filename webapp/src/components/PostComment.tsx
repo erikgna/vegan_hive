@@ -12,7 +12,7 @@ export const PostComment = ({ handlePostComment }: PostCommentProps) => {
             value={text}
             type="text"
             placeholder="Add a comment..."
-            className="flex-grow p-2 border-y border-l border-gray-300 rounded-l-md focus:outline-none focus:border-yellow-500 dark:bg-transparent"
+            className="flex-grow p-2 border-y border-l border-gray-300 rounded-l-md focus:outline-none focus:border-yellow-500 dark:bg-transparent dark:text-white"
         />
         <button
             onClick={() => {

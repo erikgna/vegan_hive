@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { Modal } from './Modal'
 import { useMutation } from '@apollo/client';
-import { auth } from '../../firebase';
 import { CREATE_POST } from '../apollo';
 import { Loading } from './Loading';
 
@@ -25,7 +24,6 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
             variables: {
                 input: {
                     content: description,
-                    authorEmail: auth.currentUser?.email,
                     file: selectedImage
                 }
             }

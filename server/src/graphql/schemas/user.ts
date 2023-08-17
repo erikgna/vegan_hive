@@ -7,6 +7,7 @@ export const userTypes = gql`
     email: String! @unique
     iconPath: String
     description: String
+    token: String
   }
 
   input CreateUserInput {
@@ -15,9 +16,13 @@ export const userTypes = gql`
   }
 
   input EditUserInput {
-    email: String!
     username: String
     file: Upload
     description: String
+  }
+
+  input SaveUserTokenInput {
+    email: String!
+    token: String!
   }
 `;

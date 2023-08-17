@@ -47,3 +47,11 @@ export const CREATE_USER = gql`
     }
   }
 `;
+
+export const SAVE_USER_TOKEN = gql`
+  mutation SaveToken($input: SaveUserTokenInput!) {
+    saveUserToken(input: $input) {
+      userId
+    }
+  }
+`;

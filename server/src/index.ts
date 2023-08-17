@@ -14,6 +14,7 @@ import cors from "cors";
 import { typeDefs } from "./graphql/schemas";
 import { resolvers } from "./graphql/resolvers";
 import { OGM } from "@neo4j/graphql-ogm";
+import "./firebase/config";
 
 dotenv.config();
 

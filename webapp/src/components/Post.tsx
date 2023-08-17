@@ -4,9 +4,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import { IPost } from "../interfaces/Post";
 import { PostModal } from "./PostModal";
 import { Modal } from "./Modal";
-import { formatDateString } from "../utils/dealDate";
+import { formatDateString } from "../utils/DealDate";
 import { BASE_URL } from "../constants/Url";
-import { auth } from "../../firebase";
 import { LikeButton } from "./LikedButton";
 import { PostComment } from "./PostComment";
 import { CREATE_COMMENT, LIKE_POST, POST_IS_LIKED } from "../apollo";
@@ -32,8 +31,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
 
     const postIsLiked = useQuery(POST_IS_LIKED, {
         variables: {
-            postId: post.postId,
-            authorEmail: auth.currentUser?.email,
+            postId: post.postId
         },
     });
 
@@ -50,7 +48,6 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
             variables: {
                 input: {
                     content: text,
-                    authorEmail: auth.currentUser?.email,
                     postId: statePost.postId,
                 },
             },
@@ -62,16 +59,11 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
     }
 
     const handleLikePost = () => {
-        const userLikedPost = postIsLiked.data.checkIfUserLikedPost;
+        const userLikedPost = postIsLiked.data?.checkIfUserLikedPost;
         const isLiked = stateLiked === null ? userLikedPost : stateLiked;
 
         likePost({
-            variables: {
-                input: {
-                    authorEmail: auth.currentUser?.email,
-                    postId: statePost.postId,
-                },
-            },
+            variables: { input: { postId: statePost.postId } },
         }).then((_) => {
             const updatedLikes = isLiked ? statePost.likes - 1 : statePost.likes + 1;
             setStatePost((prevState) => ({ ...prevState, likes: updatedLikes }));
@@ -81,7 +73,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
 
     return (
         <div className="flex flex-col bg-white p-4 shadow-md rounded-md mt-8 dark:bg-black dark:border dark:border-gray-800">
-            {showPostModal && <PostModal postIsLiked={stateLiked ?? postIsLiked.data.checkIfUserLikedPost} changeModal={changePostModal} post={statePost} />}
+            {showPostModal && <PostModal postIsLiked={stateLiked ?? postIsLiked.data?.checkIfUserLikedPost} changeModal={changePostModal} post={statePost} />}
             {showModal && (
                 <Modal changeModal={changeModal}>
                     <div className="flex flex-col justify-center p-4 text-center">
@@ -105,7 +97,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
                     </div>
                 </Modal>
             )}
-            <Link to={`/profile/${statePost.author.email}`}>
+            <Link to={`/profile/${statePost.author.userId}`}>
                 <div className="flex items-center mb-4">
                     <img
                         src={statePost.author.iconPath === null ? defaultAvatar : `${BASE_URL}${statePost.author.iconPath}`}
@@ -128,7 +120,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
             />
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
-                    <LikeButton isLiked={stateLiked ?? postIsLiked.data.checkIfUserLikedPost} handleLikePost={handleLikePost} />
+                    <LikeButton isLiked={stateLiked ?? postIsLiked.data?.checkIfUserLikedPost} handleLikePost={handleLikePost} />
                     <span className="text-gray-500 mr-2 dark:text-white">
                         {statePost.likes} likes
                     </span>

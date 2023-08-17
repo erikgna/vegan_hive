@@ -10,7 +10,6 @@ export const commentTypes = gql`
 
   input CreateCommentInput {
     content: String!
-    authorEmail: String!
     postId: ID!
   }
 `;

@@ -14,6 +14,5 @@ export const likeTypes = gql`
 
   input LikePostInput {
     postId: ID!
-    authorEmail: String!
   }
 `;

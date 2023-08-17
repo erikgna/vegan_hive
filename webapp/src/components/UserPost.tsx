@@ -4,7 +4,6 @@ import { BASE_URL } from '../constants/Url';
 import { PostModal } from './PostModal';
 import { useQuery } from '@apollo/client';
 import { POST_IS_LIKED } from '../apollo';
-import { auth } from '../../firebase';
 
 interface UserPostProps {
     post: IPost;
@@ -15,8 +14,7 @@ export const UserPost = ({ post }: UserPostProps) => {
 
     const postIsLiked = useQuery(POST_IS_LIKED, {
         variables: {
-            postId: post.postId,
-            authorEmail: auth.currentUser?.email,
+            postId: post.postId
         },
     });
 

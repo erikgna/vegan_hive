@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { Modal } from './Modal'
 import { useMutation } from '@apollo/client';
-import { auth } from '../../firebase';
 import { EDIT_USER } from '../apollo';
 import { Loading } from './Loading';
 import { IUser } from '../interfaces/User';
@@ -31,7 +30,6 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
             variables: {
                 input: {
                     description: description,
-                    email: auth.currentUser?.email,
                     file: selectedImage,
                     username: username
                 }

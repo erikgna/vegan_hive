@@ -1,5 +1,5 @@
 import path, { resolve } from "path";
-import fs, { createWriteStream, mkdir, unlink } from "fs";
+import fs, { createWriteStream, unlink } from "fs";
 
 export const saveFile = async (file: any, userPath: string) => {
   try {
@@ -25,7 +25,7 @@ export const saveFile = async (file: any, userPath: string) => {
 
     writeStream.on("error", (error) => {
       unlink(filePath, () => {
-        console.log(error);
+        throw new Error("Could not upload file. Please try again later.");
       });
     });
 
@@ -33,6 +33,6 @@ export const saveFile = async (file: any, userPath: string) => {
 
     return filePath.replace(/\\/g, "/");
   } catch (error) {
-    console.log(error);
+    throw new Error("Could not upload file. Please try again later.");
   }
 };

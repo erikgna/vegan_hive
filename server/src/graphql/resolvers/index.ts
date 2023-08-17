@@ -17,10 +17,12 @@ export const resolvers = {
     getUserPosts: postResolver.getUserPosts,
     getRecentPosts: postResolver.getRecentPosts,
     checkIfUserLikedPost: likeResolver.checkIfUserLikedPost,
+    getProfile: userResolver.getProfile,
   },
   Mutation: {
     createUser: userResolver.createUser,
     editUser: userResolver.editUser,
+    saveUserToken: userResolver.saveUserToken,
     createPost: postResolver.createPost,
     createComment: commentResolver.createComment,
     likePost: likeResolver.likePost,

@@ -15,25 +15,21 @@ import { BASE_URL } from '../../constants/Url';
 export const Profile = () => {
     const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
     const location = useLocation();
-    const email = location.pathname.split('/')[2];
+    const id = location.pathname.split('/')[2];
 
     const posts = useQuery(QUERY_USER_POSTS, {
-        variables: {
-            authorEmail: email ?? JSON.parse(localStorage.getItem('user') ?? '{}')['email']
-        }
+        variables: { userId: id ?? localStorage.getItem('userId') }
     });
 
     const profile = useQuery(QUERY_PROFILE, {
-        variables: {
-            email: email ?? JSON.parse(localStorage.getItem('user') ?? '{}')['email']
-        }
+        variables: { userId: id ?? localStorage.getItem('userId') }
     });
 
     const editProfileChangeModal = () => {
         setShowEditProfile(!showEditProfile);
     }
 
-    if (posts.loading || profile.loading) return <div><Loading /></div>
+    if (posts.loading || profile.loading) return <div className='h-screen w-screen flex items-center justify-center'><Loading /></div>
 
     const profileData = profile.data.getProfileInformation as IUser;
 
@@ -58,13 +54,13 @@ export const Profile = () => {
                             <div className="flex items-start flex-col sm:flex-row sm:items-center">
                                 <h2 className="text-lg font-semibold">{profileData.username}</h2>
                                 <button onClick={editProfileChangeModal} className="ml-0 mt-2 sm:ml-6 sm:mt-0 bg-yellow-500 text-white px-4 py-2 rounded-md">
-                                    {email ? 'Follow' : 'Edit Profile'}
+                                    {id ? 'Follow' : 'Edit Profile'}
                                 </button>
                             </div>
                             {/* Mostrará a contagem de posts, seguidores e seguindo */}
                             <div className="mt-4 text-center hidden sm:flex">
                                 <div className="mr-8">
-                                    <span className="font-semibold">10 posts</span>
+                                    <span className="font-semibold">{posts.data.getUserPosts.length} posts</span>
                                 </div>
                                 <div className="mr-8">
                                     <span className="font-semibold">123 followers</span>
@@ -85,7 +81,7 @@ export const Profile = () => {
                     <div className='dark:text-white'>
                         <div className="grid grid-cols-3 mt-10 text-center sm:hidden">
                             <div className="mr-8">
-                                <span className="font-semibold">10 <br />posts</span>
+                                <span className="font-semibold">{posts.data.getUserPosts.length} <br />posts</span>
                             </div>
                             <div className="mr-8">
                                 <span className="font-semibold">123 <br />followers</span>

@@ -14,10 +14,11 @@ export const typeDefs = gql`
   ${likeTypes}
 
   type Query {
-    checkIfUserLikedPost(postId: ID!, authorEmail: String!): Boolean!
+    checkIfUserLikedPost(postId: ID!): Boolean!
     getRecentPosts(page: Int!): [Post!]!
-    getUserPosts(authorEmail: String!): [Post!]!
-    getProfileInformation(email: String!): User!
+    getUserPosts(userId: ID!): [Post!]!
+    getProfileInformation(userId: ID!): User!
+    getProfile(email: String!): User!
   }
 
   type Mutation {
@@ -26,5 +27,6 @@ export const typeDefs = gql`
     createPost(input: CreatePostInput!): Post
     likePost(input: LikePostInput!): LikeResult
     editUser(input: EditUserInput!): User
+    saveUserToken(input: SaveUserTokenInput!): User
   }
 `;

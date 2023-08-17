@@ -54,7 +54,7 @@ export const ForgotPassword = () => {
             {feedback.msg !== '' && <p className={`text-${feedback.type === FeedbackTypes.ERROR ? 'red' : 'green'}-600 mb-2 text-sm`}>{feedback.msg}</p>}
 
             {loading ?
-                <Loading /> :
+                <div className="flex items-center justify-center w-full"><Loading /></div> :
                 <button type="submit" className="bg-yellow-500 text-white font-semibold py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:ring focus:border-yellow-300 max-w-[700px] w-full">Recover password</button>
             }
 

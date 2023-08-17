@@ -13,7 +13,6 @@ export const postTypes = gql`
   }
   input CreatePostInput {
     content: String!
-    authorEmail: String!
     file: Upload!
   }
 `;
