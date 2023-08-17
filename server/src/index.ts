@@ -11,8 +11,9 @@ import {
 } from "apollo-server-core";
 import cors from "cors";
 
-import { typeDefs } from "./schemas";
-import { resolvers } from "./resolvers";
+import { typeDefs } from "./graphql/schemas";
+import { resolvers } from "./graphql/resolvers";
+import { OGM } from "@neo4j/graphql-ogm";
 
 dotenv.config();
 
@@ -62,5 +63,7 @@ const startApolloServer = async () => {
 
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
 };
+
+export const ogm = new OGM({ typeDefs, driver });
 
 startApolloServer();

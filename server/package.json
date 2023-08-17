@@ -12,6 +12,7 @@
   "dependencies": {
     "@apollo/server": "^4.9.1",
     "@neo4j/graphql": "^3.24.1",
+    "@neo4j/graphql-ogm": "^3.24.1",
     "apollo-server": "^3.12.0",
     "apollo-server-core": "^3.12.0",
     "apollo-server-express": "^3.12.0",
