@@ -19,7 +19,7 @@ import "./firebase/config";
 dotenv.config();
 
 export const driver = neo4j.driver(
-  "neo4j://neo4j_container:7687",
+  "neo4j://localhost:7687",
   neo4j.auth.basic("neo4j"!, "12345678"!)
 );
 
