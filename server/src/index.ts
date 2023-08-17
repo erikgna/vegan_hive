@@ -19,8 +19,8 @@ import "./firebase/config";
 dotenv.config();
 
 export const driver = neo4j.driver(
-  process.env.NEO4J_URI!,
-  neo4j.auth.basic(process.env.NEO4J_USER!, process.env.NEO4J_PASSWORD!)
+  "neo4j://neo4j_container:7687",
+  neo4j.auth.basic("neo4j"!, "12345678"!)
 );
 
 const startApolloServer = async () => {

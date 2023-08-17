@@ -128,7 +128,7 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
   };
 
   return (
-    <section className="flex h-screen">
+    <section className="flex min-h-screen">
       <div className="hidden md:flex w-1/2 flex flex-col justify-center items-center px-6 place-pattern text-center">
         <img className="w-96 mb-8" src={community} alt="Community" />
         <h1 className="text-5xl font-bold mb-4 text-yellow-500">
