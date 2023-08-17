@@ -80,7 +80,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
     };
 
     return (
-        <div className="bg-white p-4 shadow-md rounded-md mt-8 dark:bg-black dark:border dark:border-gray-800">
+        <div className="flex flex-col bg-white p-4 shadow-md rounded-md mt-8 dark:bg-black dark:border dark:border-gray-800">
             {showPostModal && <PostModal postIsLiked={stateLiked ?? postIsLiked.data.checkIfUserLikedPost} changeModal={changePostModal} post={statePost} />}
             {showModal && (
                 <Modal changeModal={changeModal}>

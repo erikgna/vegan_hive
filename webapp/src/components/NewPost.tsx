@@ -35,7 +35,7 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
     return (
         <>
             <Modal changeModal={changeShowNewPostModal}>
-                <div className="flex flex-col justify-center items-center p-4 min-w-[320px]">
+                <div className="flex flex-col justify-center items-center p-1 sm:p-4 min-w-[260px] min-w-[320px]">
                     <h2 className="text-xl font-semibold mb-2 dark:text-white">New Post</h2>
                     {loading ? <div className='mt-8'>
                         <Loading />
@@ -84,7 +84,7 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
                                     id="description"
                                     name="description"
                                     placeholder="Type the description"
-                                    className="w-full min-w-[320px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-yellow-300 resize-none dark:bg-transparent dark:border-gray-600 dark:text-white"
+                                    className="w-full min-w-[260px] sm:min-w-[320px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-yellow-300 resize-none dark:bg-transparent dark:border-gray-600 dark:text-white"
                                     onChange={(e) => setDescription(e.target.value)}
                                     value={description}
                                     required

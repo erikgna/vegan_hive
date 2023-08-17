@@ -42,7 +42,7 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
     return (
         <>
             <Modal changeModal={editProfileChangeModal}>
-                <div className="flex flex-col justify-center items-center p-4 min-w-[320px]">
+                <div className="flex flex-col justify-center items-center p-1 sm:p-4 min-w-[260px] sm:min-w-[320px]">
                     <h2 className="text-xl font-semibold mb-2 dark:text-white">Editing profile</h2>
                     {loading ? <div className='mt-8'>
                         <Loading />
@@ -83,7 +83,7 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
                                     name="username"
                                     type="text"
                                     placeholder="Type your name"
-                                    className="w-full min-w-[320px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-yellow-300 resize-none dark:bg-transparent dark:border-gray-600 dark:text-white"
+                                    className="w-full min-w-[260px] sm:min-w-[320px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-yellow-300 resize-none dark:bg-transparent dark:border-gray-600 dark:text-white"
                                     onChange={(e) => setUsername(e.target.value)}
                                     value={username}
                                     required
@@ -95,7 +95,7 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
                                     id="description"
                                     name="description"
                                     placeholder="Type the description"
-                                    className="w-full min-w-[320px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-yellow-300 resize-none dark:bg-transparent dark:border-gray-600 dark:text-white"
+                                    className="w-full min-w-[260px] sm:min-w-[320px] px-3 py-2 border rounded focus:outline-none focus:ring focus:border-yellow-300 resize-none dark:bg-transparent dark:border-gray-600 dark:text-white"
                                     onChange={(e) => setDescription(e.target.value)}
                                     value={description}
                                     required

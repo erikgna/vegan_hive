@@ -6,6 +6,7 @@ import { Post } from "../../components/Post";
 import { IPost } from "../../interfaces/Post";
 import { Loading } from "../../components/Loading";
 import { QUERY_POSTS } from "../../apollo";
+import noPosts from "../../assets/images/empty.svg";
 
 export const Home = () => {
   const [currentPosts, setCurrentPosts] = useState<any>([]);
@@ -37,8 +38,15 @@ export const Home = () => {
   if (currentPosts.length === 0) return <Loading />;
 
   return (
-    <section onClick={() => console.log(currentPosts)} className="w-full min-h-screen flex justify-center pb-8 dark:bg-black pl-[256px]">
-      <div className="flex flex-col align-center max-post-width">
+    <section onClick={() => console.log(currentPosts)} className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-0 sm:pl-20">
+      <div className={`flex flex-col align-center max-post-width ${currentPosts.length === 0 && 'justify-center'}`}>
+        {currentPosts.length === 0 &&
+          <div className="flex flex-col items-center justify-center">
+            <img className="h-64 w-64" src={noPosts} alt="No posts" />
+            <p className="mt-4 text-lg font-semibold">No posts yet</p>
+          </div>
+        }
+
         <InfiniteScroll
           dataLength={currentPosts.length}
           next={next}

@@ -1,5 +1,8 @@
 import admin from "firebase-admin";
+import dotenv from "dotenv";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
+
+dotenv.config();
 
 admin.initializeApp({
   credential: admin.credential.cert({

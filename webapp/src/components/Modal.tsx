@@ -13,7 +13,7 @@ export const Modal = ({ changeModal, children }: ModalPrps) => {
     }
 
     return (
-        <div onClick={handleOutsideClick} className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div onClick={handleOutsideClick} className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50 px-1">
             <div className="flex bg-white p-4 overflow-hidden relative rounded-md dark:bg-black">
                 {children}
             </div>

@@ -61,8 +61,8 @@ export const PostModal = ({ post, postIsLiked, changeModal }: PostModalPrps) => 
 
     return (
         <div onClick={handleOutsideClick} className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
-            <div className="flex bg-white pr-3 w-4/5 h-4/5 overflow-hidden relative dark:bg-black">
-                <div className="flex items-center justify-center w-3/4 h-full mr-4 bg-black bg-opacity-200">
+            <div className="flex flex-col md:flex-row bg-white md:pr-3 w-4/5 h-[95%] md:h-4/5 overflow-hidden relative dark:bg-[#181818]">
+                <div className="flex items-center justify-center w-full w-3/4 md:h-full h-[60%] md:mr-4 bg-black bg-opacity-200">
                     <div className="w-full h-60 overflow-hidden">
                         <img
                             src={`${BASE_URL}${statePost.imagePath}`}
@@ -71,8 +71,8 @@ export const PostModal = ({ post, postIsLiked, changeModal }: PostModalPrps) => 
                         />
                     </div>
                 </div>
-                <div className="flex flex-col justify-between">
-                    <div className="flex flex-col overflow-y-auto hide-scrollbar pt-4">
+                <div className="flex flex-col justify-between md:px-0 px-2 overflow-y-auto hide-scrollbar md:h-full h-[40%] min-w-[300px]">
+                    <div className="flex flex-col sm:overflow-y-auto hide-scrollbar pt-4">
                         {statePost.comments.map((comment) => (
                             <div
                                 key={comment.commentId}

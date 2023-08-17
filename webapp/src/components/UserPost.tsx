@@ -26,12 +26,12 @@ export const UserPost = ({ post }: UserPostProps) => {
     };
 
     return (
-        <div onClick={changePostModal} key={post.postId} className="cursor-pointer bg-[#131313] h-[310px] w-[310px] flex items-center justify-center">
+        <div onClick={changePostModal} key={post.postId} className="cursor-pointer bg-[#131313] flex items-center justify-center">
             {showPostModal && !postIsLiked.loading && <PostModal postIsLiked={postIsLiked.data.checkIfUserLikedPost} changeModal={changePostModal} post={post} />}
             <img
                 src={`${BASE_URL}${post.imagePath}`}
                 alt={post.content}
-                className="w-full h-full object-contain"
+                className="sm:w-full h-auto min-h-100 min-w-100 object-cover"
             />
         </div>
     )

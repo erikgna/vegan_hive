@@ -58,7 +58,7 @@ services:
       - traefik.http.routers.veganhive.tls=true
       - traefik.http.routers.veganhive.tls.certresolver=production
     environment:
-      - SERVER_URL=https://veganhiveserver.erikna.com/
+      - VITE_SERVER_URL=https://veganhiveserver.erikna.com/
     networks:
       - web
     restart: always
