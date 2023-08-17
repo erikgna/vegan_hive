@@ -8,6 +8,8 @@ networks:
 
 services:
   neo4j_container:
+    networks:
+      - web
     image: neo4j:latest
     container_name: neo4j_container
     environment:
