@@ -1,52 +1,68 @@
-import { driver } from "../..";
+import { driver, ogm } from "../..";
 import { AuthUtils } from "../../firebase/auth";
 import { saveFile } from "../../utils/saveFile";
 
 export class PostResolver {
   getUserPosts = async (_: any, args: any) => {
-    const { authorEmail } = args;
-
-    const session = driver.session();
     try {
-      const recentPosts = await session.executeRead(async (tx) => {
-        const query = `
-            MATCH (p:Post)-[:AUTHOR]->(u:User)
-            WHERE u.email = $authorEmail
-  RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
-         u.userId AS authorId, u.username AS authorUsername, u.email AS authorEmail,
-         p.likes AS likes, p.comments AS comments, p.allLikes AS allLikes,
-         p.date AS date
-            ORDER BY date DESC
-              `;
+      await ogm.init();
+      const Post = ogm.model("Post");
 
-        const result = await tx.run(query, { authorEmail });
-        const recentPosts = [];
-
-        for (const record of result.records) {
-          const post = {
-            postId: record.get("postId"),
-            content: record.get("content"),
-            imagePath: record.get("imagePath"),
-            likes: record.get("likes"),
-            comments: record.get("comments") ?? [],
-            allLikes: record.get("allLikes") ?? [],
-            date: record.get("date"),
-            author: {
-              userId: record.get("authorId"),
-              username: record.get("authorUsername"),
-              email: record.get("authorEmail"),
-            },
-          };
-          recentPosts.push(post);
-        }
-
-        return recentPosts;
+      const posts = await Post.find({
+        where: {
+          author: {
+            email: args.authorEmail,
+          },
+        },
       });
 
-      return recentPosts;
+      return posts;
     } catch (error) {
-      console.log(error);
+      throw new Error("An error ocurred while retrieving user posts.");
     }
+    //   const { authorEmail } = args;
+
+    //   const session = driver.session();
+    //   try {
+    //     const recentPosts = await session.executeRead(async (tx) => {
+    //       const query = `
+    //           MATCH (p:Post)-[:AUTHOR]->(u:User)
+    //           WHERE u.email = $authorEmail
+    // RETURN p.postId AS postId, p.content AS content, p.imagePath AS imagePath,
+    //        u.userId AS authorId, u.username AS authorUsername, u.email AS authorEmail,
+    //        p.likes AS likes, p.comments AS comments, p.allLikes AS allLikes,
+    //        p.date AS date
+    //           ORDER BY date DESC
+    //             `;
+
+    //       const result = await tx.run(query, { authorEmail });
+    //       const recentPosts = [];
+
+    //       for (const record of result.records) {
+    //         const post = {
+    //           postId: record.get("postId"),
+    //           content: record.get("content"),
+    //           imagePath: record.get("imagePath"),
+    //           likes: record.get("likes"),
+    //           comments: record.get("comments") ?? [],
+    //           allLikes: record.get("allLikes") ?? [],
+    //           date: record.get("date"),
+    //           author: {
+    //             userId: record.get("authorId"),
+    //             username: record.get("authorUsername"),
+    //             email: record.get("authorEmail"),
+    //           },
+    //         };
+    //         recentPosts.push(post);
+    //       }
+
+    //       return recentPosts;
+    //     });
+
+    //     return recentPosts;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
   };
   getRecentPosts = async (_: any, args: any) => {
     const { page } = args;

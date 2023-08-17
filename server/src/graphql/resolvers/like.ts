@@ -1,53 +1,29 @@
-import { driver, ogm } from "../..";
-
-import { Model } from "@neo4j/graphql-ogm";
-
-const typeDefs = `
-    type Like {
-      likeId: ID! @id
-      post: Post! @relationship(type: "POST", direction: OUT)
-      user: User! @relationship(type: "USER", direction: OUT)
-    }
-`;
+import { ogm } from "../..";
 export class LikeResolver {
   checkIfUserLikedPost = async (_: any, args: any) => {
-    await ogm.init();
-    const Like = ogm.model("Like");
+    try {
+      await ogm.init();
+      const Like = ogm.model("Like");
 
-    const likes = await Like.find({
-      where: {
-        post: {
-          postId: args.postId,
+      const likes = await Like.find({
+        where: {
+          post: {
+            postId: args.postId,
+          },
+          user: {
+            email: args.authorEmail,
+          },
         },
-        user: {
-          email: args.authorEmail,
-        },
-      },
-    });
+      });
 
-    console.log(likes);
-
-    // const { authorEmail, postId } = args;
-    // const session = driver.session();
-    // try {
-    //   const hasLike = await session.executeRead(async (tx) => {
-    //     const query = `
-    //           MATCH (:Post {postId: $postId})--(like:Like)
-    //           MATCH (:User {email: $authorEmail})--(like2:Like)
-    //           WITH COLLECT(like) AS postLikes, COLLECT(like2) AS userLikes
-    //           RETURN [like IN postLikes WHERE like IN userLikes | like] AS commonLikes
-    //       `;
-    //     const params = {
-    //       postId,
-    //       authorEmail,
-    //     };
-    //     const result = await tx.run(query, params);
-    //     const commonLikes = result.records[0].get("commonLikes");
-    //     return commonLikes.length > 0;
-    //   });
-    //   return hasLike;
-    // } catch (error) {}
+      return likes.length === 0;
+    } catch (error) {
+      throw new Error(
+        "An error ocurred while retrieving like information about the post."
+      );
+    }
   };
+
   likePost = async (_: any, args: any) => {
     console.log(args.input.postId, args.input.authorEmail);
     await ogm.init();
