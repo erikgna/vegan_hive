@@ -1,4 +1,3 @@
-import React from 'react';
 import hiveLoading from '../assets/icons/hive_loading.svg'
 
 const Loading = () => {
@@ -7,4 +6,4 @@ const Loading = () => {
     )
 }
 
-export default React.memo(Loading);
+export default Loading

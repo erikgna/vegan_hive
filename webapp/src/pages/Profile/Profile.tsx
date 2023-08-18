@@ -11,7 +11,6 @@ import { IUser } from '../../interfaces/User';
 
 import defaultAvatar from "../../assets/images/default_avatar.png";
 import { BASE_URL } from '../../constants/Url';
-import React from 'react';
 
 const Profile = () => {
     const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
@@ -118,4 +117,4 @@ const Profile = () => {
     )
 }
 
-export default React.memo(Profile)
+export default Profile

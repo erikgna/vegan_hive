@@ -20,7 +20,6 @@ import defaultAvatar from "../assets/images/default_avatar.png";
 import icon from "../assets/images/icon.png";
 
 import { BASE_URL } from '../constants/Url';
-import React from 'react';
 
 const SideBar = () => {
     const location = useLocation();
@@ -165,4 +164,4 @@ const SideBar = () => {
     )
 }
 
-export default React.memo(SideBar);
+export default SideBar

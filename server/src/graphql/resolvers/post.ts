@@ -1,6 +1,7 @@
 import { driver, ogm } from "../..";
 import { AuthUtils } from "../../firebase/auth";
 import { saveFile } from "../../utils/saveFile";
+import fs from "fs";
 
 const selectionSet = `
       {
@@ -45,6 +46,8 @@ export class PostResolver {
 
       if (post.length === 0)
         throw new Error("You are not the author of this post.");
+
+      fs.unlinkSync(post[0].imagePath);
 
       await Post.delete({
         where: { postId },

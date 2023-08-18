@@ -267,4 +267,4 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
   );
 };
 
-export default React.memo(Authentication);
+export default Authentication

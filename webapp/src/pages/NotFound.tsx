@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { ConstRoutes } from '../constants/Routes'
-import React from 'react'
 
 const NotFound = () => {
     return (
@@ -28,4 +27,4 @@ const NotFound = () => {
     )
 }
 
-export default React.memo(NotFound)
+export default NotFound

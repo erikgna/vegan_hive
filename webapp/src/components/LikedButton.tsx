@@ -1,7 +1,6 @@
 import likedIcon from "../assets/icons/heart-solid.svg";
 import likeIconWhite from "../assets/icons/heart-regular-white.svg";
 import likeIconDark from "../assets/icons/heart-regular-dark.svg";
-import React from "react";
 
 interface LikeButtonProps {
     isLiked: boolean;
@@ -25,4 +24,4 @@ const LikeButton = ({ isLiked, handleLikePost }: LikeButtonProps) => {
     </button >
 }
 
-export default React.memo(LikeButton)
+export default LikeButton

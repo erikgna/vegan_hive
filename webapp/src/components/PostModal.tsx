@@ -137,4 +137,4 @@ const PostModal = ({ post, postIsLiked, changeModal, handleDeletePost }: PostMod
     )
 }
 
-export default React.memo(PostModal);
+export default PostModal

@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface ModalPrps {
     changeModal: () => void;
     children: React.ReactNode;
@@ -21,4 +19,4 @@ const Modal = ({ changeModal, children }: ModalPrps) => {
     )
 }
 
-export default React.memo(Modal)
+export default Modal

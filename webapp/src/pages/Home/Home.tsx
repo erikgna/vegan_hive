@@ -6,8 +6,6 @@ import Post from "../../components/Post";
 import { IPost } from "../../interfaces/Post";
 import Loading from "../../components/Loading";
 import { QUERY_POSTS } from "../../apollo";
-import noPosts from "../../assets/images/empty.svg";
-import React from "react";
 
 const Home = () => {
   const [currentPosts, setCurrentPosts] = useState<any>([]);
@@ -36,23 +34,20 @@ const Home = () => {
     }
   }, [posts.data])
 
-  if (currentPosts.length === 0) return <div className='h-screen w-screen flex items-center justify-center'><Loading /></div>
+  if (currentPosts.length === 0) return <div className='h-screen w-screen flex flex-col items-center justify-center'>
+    <Loading />
+    <p className="mt-4 text-lg font-semibold">No posts yet</p>
+  </div>
 
   return (
     <section className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-4 sm:pl-20 pr-4">
       <div className={`flex flex-col align-center max-post-width ${currentPosts.length === 0 && 'justify-center'}`}>
-        {currentPosts.length === 0 &&
-          <div className="flex flex-col items-center justify-center">
-            <img className="h-64 w-64" src={noPosts} alt="No posts" />
-            <p className="mt-4 text-lg font-semibold">No posts yet</p>
-          </div>
-        }
 
         <InfiniteScroll
           dataLength={currentPosts.length}
           next={next}
           hasMore={hasMore}
-          loader={<div className="mt-8 flex justify-center items-center"><Loading /></div>}
+          loader={<div className="mt-8 flex justify-center items-center"></div>}
           endMessage={<h4 className="text-center text-gray-500 mt-12 mb-8">No more posts</h4>}
         >
           {currentPosts.map((post: IPost) => (
@@ -64,4 +59,4 @@ const Home = () => {
   );
 };
 
-export default React.memo(Home);
+export default Home

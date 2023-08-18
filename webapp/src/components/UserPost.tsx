@@ -4,7 +4,6 @@ import { BASE_URL } from '../constants/Url';
 import PostModal from './PostModal';
 import { useQuery } from '@apollo/client';
 import { POST_IS_LIKED } from '../apollo';
-import React from 'react';
 
 interface UserPostProps {
     post: IPost;
@@ -40,4 +39,4 @@ const UserPost = ({ post, handleDeletePost }: UserPostProps) => {
     )
 }
 
-export default React.memo(UserPost);
+export default UserPost

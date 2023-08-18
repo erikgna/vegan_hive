@@ -8,7 +8,6 @@ import { IUser } from '../interfaces/User';
 import { BASE_URL } from '../constants/Url';
 
 import defaultAvatar from '../assets/images/default_avatar.png'
-import React from 'react';
 
 interface EditProfileProps {
     editProfileChangeModal: () => void;
@@ -112,4 +111,4 @@ const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) => {
     )
 }
 
-export default React.memo(EditProfile)
+export default EditProfile

@@ -4,7 +4,6 @@ import Modal from './Modal'
 import { useMutation } from '@apollo/client';
 import { CREATE_POST } from '../apollo';
 import Loading from './Loading';
-import React from 'react';
 
 interface NewPostProps {
     changeShowNewPostModal: () => void;
@@ -101,4 +100,4 @@ const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
     )
 }
 
-export default React.memo(NewPost)
+export default NewPost

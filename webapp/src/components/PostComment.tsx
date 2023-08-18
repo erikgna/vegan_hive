@@ -27,4 +27,4 @@ const PostComment = ({ handlePostComment }: PostCommentProps) => {
     </div>
 }
 
-export default React.memo(PostComment);
+export default PostComment

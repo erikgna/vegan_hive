@@ -142,4 +142,4 @@ const Post = ({ post }: PostProps) => {
     );
 };
 
-export default React.memo(Post);
+export default Post
