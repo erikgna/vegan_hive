@@ -2,25 +2,24 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 
 import { IPost } from "../interfaces/Post";
-import { PostModal } from "./PostModal";
-import { Modal } from "./Modal";
+import PostModal from "./PostModal";
+import Modal from "./Modal";
 import { formatDateString } from "../utils/DealDate";
 import { BASE_URL } from "../constants/Url";
-import { LikeButton } from "./LikedButton";
-import { PostComment } from "./PostComment";
+import LikeButton from "./LikedButton";
+import PostComment from "./PostComment";
 import { CREATE_COMMENT, LIKE_POST, POST_IS_LIKED } from "../apollo";
 
-import trashIconDark from "../assets/icons/trash-solid-dark.svg";
-import trashIconWhite from "../assets/icons/trash-solid-white.svg";
 import defaultAvatar from "../assets/images/default_avatar.png";
 import { Link } from "react-router-dom";
+import React from "react";
 
 interface PostProps {
     post: IPost;
     isFromUser?: boolean;
 }
 
-export const Post = ({ post, isFromUser = false }: PostProps) => {
+const Post = ({ post }: PostProps) => {
     const [statePost, setStatePost] = useState(post)
     const [showPostModal, setShowPostModal] = useState<boolean>(false);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -51,7 +50,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
                     postId: statePost.postId,
                 },
             },
-        }).then((data) => setStatePost((prevState) => ({ ...prevState, comments: [...prevState.comments, { ...data.data.createComment }] })));
+        }).then((data) => setStatePost((prevState) => ({ ...prevState, comments: [{ ...data.data.createComment }, ...prevState.comments] })));
     };
 
     if (postIsLiked.loading) {
@@ -72,7 +71,7 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
     };
 
     return (
-        <div className="flex flex-col bg-white p-4 shadow-md rounded-md mt-8 dark:bg-black dark:border dark:border-gray-800">
+        <div className="flex flex-col bg-white p-4 shadow-md rounded-md border mt-8 dark:bg-black dark:border dark:border-gray-800">
             {showPostModal && <PostModal postIsLiked={stateLiked ?? postIsLiked.data?.checkIfUserLikedPost} changeModal={changePostModal} post={statePost} />}
             {showModal && (
                 <Modal changeModal={changeModal}>
@@ -113,11 +112,13 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
                 </div>
             </Link>
             <p className="text-gray-600 mb-4 dark:text-white">{statePost.content}</p>
-            <img
-                src={`${BASE_URL}${statePost.imagePath}`}
-                alt={statePost.content}
-                className="mb-4 rounded-md"
-            />
+            <div className="flex items-center justify-center w-full my-3">
+                <img
+                    src={`${BASE_URL}${statePost.imagePath}`}
+                    alt={statePost.content}
+                    className="max-w-full max-h-full mb-4 rounded-md"
+                />
+            </div>
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
                     <LikeButton isLiked={stateLiked ?? postIsLiked.data?.checkIfUserLikedPost} handleLikePost={handleLikePost} />
@@ -125,19 +126,6 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
                         {statePost.likes} likes
                     </span>
                 </div>
-                {isFromUser && (
-                    <button onClick={changeModal}>
-                        <img
-                            src={
-                                window.localStorage.getItem("theme")?.includes("dark")
-                                    ? trashIconWhite
-                                    : trashIconDark
-                            }
-                            alt="Delete here"
-                            className="w-5 h-5"
-                        />
-                    </button>
-                )}
             </div>
             <div className="flex justify-between">
                 <div className="flex items-center">
@@ -153,3 +141,5 @@ export const Post = ({ post, isFromUser = false }: PostProps) => {
         </div>
     );
 };
+
+export default React.memo(Post);

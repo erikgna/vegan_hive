@@ -1,15 +1,16 @@
 import { useState } from 'react';
 
-import { Modal } from './Modal'
+import Modal from './Modal'
 import { useMutation } from '@apollo/client';
 import { CREATE_POST } from '../apollo';
-import { Loading } from './Loading';
+import Loading from './Loading';
+import React from 'react';
 
 interface NewPostProps {
     changeShowNewPostModal: () => void;
 }
 
-export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
+const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
     const [description, setDescription] = useState<string>('')
     const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false)
@@ -43,7 +44,7 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
                                 <label htmlFor="image" className="block text-sm font-semibold mb-2">
                                     Upload Image
                                 </label>
-                                <div className="bg-gray-100 border border-dashed border-gray-400 text-center p-8 cursor-pointer hover:bg-gray-200 dark:bg-black dark:hover:bg-gray-900 transition-all duration-300">
+                                <div className="bg-gray-100 border border-dashed border-gray-400 text-center p-8 cursor-pointer hover:bg-gray-200 dark:bg-[#111] dark:hover:bg-gray-900 transition-all duration-300">
                                     {selectedImage ? (
                                         <img src={URL.createObjectURL(selectedImage)} alt="Preview" className="mx-auto h-full w-full object-contain" />
                                     ) : (
@@ -99,3 +100,5 @@ export const NewPost = ({ changeShowNewPostModal }: NewPostProps) => {
         </>
     )
 }
+
+export default React.memo(NewPost)

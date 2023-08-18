@@ -28,5 +28,7 @@ export const typeDefs = gql`
     likePost(input: LikePostInput!): LikeResult
     editUser(input: EditUserInput!): User
     saveUserToken(input: SaveUserTokenInput!): User
+    deleteComment(input: DeleteCommentInput!): String
+    deletePost(input: DeletePostInput!): String
   }
 `;

@@ -24,7 +24,8 @@ export class UserResolver {
       throw new Error("Couldn't authenticate user.");
     }
   };
-  getProfileInformation = async (_: any, args: any) => {
+  getProfileInformation = async (_: any, args: any, context: any) => {
+    await AuthUtils.verifyToken(context.firebaseId);
     try {
       await ogm.init();
       const User = ogm.model("User");
@@ -43,7 +44,8 @@ export class UserResolver {
     }
   };
 
-  getProfile = async (_: any, args: any) => {
+  getProfile = async (_: any, args: any, context: any) => {
+    await AuthUtils.verifyToken(context.firebaseId);
     try {
       await ogm.init();
       const User = ogm.model("User");

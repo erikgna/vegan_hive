@@ -7,6 +7,7 @@ import { graphqlUploadExpress } from "graphql-upload-minimal";
 import express from "express";
 import {
   ApolloServerPluginDrainHttpServer,
+  ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageLocalDefault,
 } from "apollo-server-core";
 import cors from "cors";
@@ -19,8 +20,8 @@ import "./firebase/config";
 dotenv.config();
 
 export const driver = neo4j.driver(
-  "neo4j://neo4j_container:7687",
-  neo4j.auth.basic("neo4j"!, "12345678"!)
+  process.env.NEO4J_URI!,
+  neo4j.auth.basic(process.env.NEO4J_USER!, process.env.NEO4J_PASSWORD!)
 );
 
 const startApolloServer = async () => {
@@ -45,6 +46,7 @@ const startApolloServer = async () => {
     csrfPrevention: false,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
+      // ApolloServerPluginLandingPageDisabled(),
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
     context: ({ req }) => {

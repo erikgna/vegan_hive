@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { Modal } from './Modal';
+import Modal from './Modal';
 import { ConstRoutes } from '../constants/Routes';
-import { NewPost } from './NewPost';
+import NewPost from './NewPost';
 
 import houseIconDark from '../assets/icons/house-solid-dark.svg';
 import houseIconWhite from '../assets/icons/house-solid-white.svg';
@@ -20,8 +20,9 @@ import defaultAvatar from "../assets/images/default_avatar.png";
 import icon from "../assets/images/icon.png";
 
 import { BASE_URL } from '../constants/Url';
+import React from 'react';
 
-export const SideBar = () => {
+const SideBar = () => {
     const location = useLocation();
     const [current, setCurrent] = useState<string>(location.pathname);
     const [showSignOutModal, setShowSignOutModal] = useState<boolean>(false)
@@ -83,24 +84,23 @@ export const SideBar = () => {
                 {showNewPostModal && <NewPost changeShowNewPostModal={changeShowNewPostModal} />}
                 <div className='flex justify-between items-center w-full'>
                     <Link onClick={() => changeCurrentRoute(ConstRoutes.HOME)} to={ConstRoutes.HOME} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.HOME ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
-                        <img src={window.localStorage.getItem('theme')?.includes('dark') ? houseIconWhite : houseIconDark} alt='home' className="w-8 h-8 text-gray-500 transition duration-75 group-hover:text-gray-900" />
+                        <img src={window.localStorage.getItem('theme')?.includes('dark') ? houseIconWhite : houseIconDark} alt='home' className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900" />
                     </Link>
                     <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
                         <img
                             src={loading ? defaultAvatar : data.getProfile.iconPath === null ? defaultAvatar : `${BASE_URL}${data.getProfile.iconPath}`}
                             alt="User Avatar"
-                            className="w-8 xl:h-8 h-8 rounded-full"
+                            className="w-7 h-7 rounded-full"
                         />
                     </Link>
                     <button onClick={changeShowNewPostModal} className="max-w-[64px] flex items-center justify-center bg-yellow-500 p-2 rounded-lg font-semibold text-white w-full transition duration-300 ease-in-out hover:bg-yellow-600">
                         <img src={plusIcon} alt="Ícone" className="w-5 h-5" />
                     </button>
                     <div onClick={changeThemeMode} className='flex items-center cursor-pointer'>
-                        <img className='h-8 w-8' src={window.localStorage.getItem('theme')?.includes('dark') ? sunIcon : moonIcon} alt="light toggle" />
-                        <span className='hidden xl:block font-bold text-yellow-500 ml2'>{window.localStorage.getItem('theme')?.includes('dark') ? 'Light mode' : 'Dark mode'}</span>
+                        <img className='h-6 w-6' src={window.localStorage.getItem('theme')?.includes('dark') ? sunIcon : moonIcon} alt="light toggle" />
                     </div>
                     <div onClick={changeSignOutModal} className="flex items-center text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer dark:text-white transition-all duration-300">
-                        <img src={window.localStorage.getItem('theme')?.includes('dark') ? powerOffWhite : powerOffDark} alt='home' className="w-7 h-7 text-gray-500 transition duration-75 group-hover:text-gray-900" />
+                        <img src={window.localStorage.getItem('theme')?.includes('dark') ? powerOffWhite : powerOffDark} alt='home' className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900" />
                     </div>
                 </div>
             </aside>
@@ -133,7 +133,7 @@ export const SideBar = () => {
                             </Link>
                         </li>
                         <li>
-                            <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
+                            <Link onClick={() => changeCurrentRoute(ConstRoutes.MY_PROFILE)} to={ConstRoutes.MY_PROFILE} className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 group dark:text-white transition-all duration-300 ${current === ConstRoutes.MY_PROFILE ? 'bg-gray-100 dark:bg-gray-900' : ''}`}>
                                 <img
                                     src={loading ? defaultAvatar : data.getProfile.iconPath === null ? defaultAvatar : `${BASE_URL}${data.getProfile.iconPath}`}
                                     alt="User Avatar"
@@ -164,3 +164,5 @@ export const SideBar = () => {
         </>
     )
 }
+
+export default React.memo(SideBar);

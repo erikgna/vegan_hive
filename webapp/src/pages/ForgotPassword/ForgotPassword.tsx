@@ -4,11 +4,11 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 
 import { ConstRoutes } from '../../constants/Routes'
 import { auth } from '../../../firebase';
-import { Loading } from '../../components/Loading';
+import Loading from '../../components/Loading';
 import { errorMessages } from '../../../firebase/error_messages/auth_errors';
 import { FeedbackTypes } from '../../constants/FeedbackTypes';
 
-export const ForgotPassword = () => {
+const ForgotPassword = () => {
     const [email, setEmail] = React.useState<string>('')
     const [loading, setLoading] = React.useState<boolean>(false)
     const [feedback, setFeedback] = useState({ msg: '', type: '' })
@@ -64,3 +64,5 @@ export const ForgotPassword = () => {
         </form>
     </section>
 }
+
+export default React.memo(ForgotPassword)

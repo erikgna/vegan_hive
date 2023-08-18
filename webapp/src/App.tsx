@@ -1,13 +1,13 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { Home } from "./pages/Home/Home";
-import { SideBar } from "./components/SideBar";
-import { Authentication } from "./pages/Authentication/Authentication";
+import Home from "./pages/Home/Home";
+import SideBar from "./components/SideBar";
+import Authentication from "./pages/Authentication/Authentication";
 import { ConstRoutes } from "./constants/Routes";
-import { ForgotPassword } from "./pages/ForgotPassword/ForgotPassword";
-import { NotFound } from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
-import { Profile } from "./pages/Profile/Profile";
+import Profile from "./pages/Profile/Profile";
 
 export const App = () => {
   useEffect(() => {

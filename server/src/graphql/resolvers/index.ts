@@ -24,7 +24,9 @@ export const resolvers = {
     editUser: userResolver.editUser,
     saveUserToken: userResolver.saveUserToken,
     createPost: postResolver.createPost,
+    deletePost: postResolver.deletePost,
     createComment: commentResolver.createComment,
+    deleteComment: commentResolver.deleteComment,
     likePost: likeResolver.likePost,
   },
 };

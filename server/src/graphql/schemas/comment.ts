@@ -12,4 +12,8 @@ export const commentTypes = gql`
     content: String!
     postId: ID!
   }
+
+  input DeleteCommentInput {
+    commentId: ID!
+  }
 `;

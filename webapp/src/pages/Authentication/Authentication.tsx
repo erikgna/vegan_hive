@@ -16,7 +16,7 @@ import community from "../../assets/images/community.png";
 import googleBtn from "../../assets/images/google_btn.png";
 import { ApolloError, useMutation } from "@apollo/client";
 import { CREATE_USER, SAVE_USER_TOKEN } from "../../apollo";
-import { Loading } from "../../components/Loading";
+import Loading from "../../components/Loading";
 
 interface AutheticationProps {
   isLogin: boolean;
@@ -24,7 +24,7 @@ interface AutheticationProps {
 
 const provider = new GoogleAuthProvider();
 
-export const Authentication = ({ isLogin }: AutheticationProps) => {
+const Authentication = ({ isLogin }: AutheticationProps) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<AuthFormData>({
@@ -265,3 +265,5 @@ export const Authentication = ({ isLogin }: AutheticationProps) => {
     </section>
   );
 };
+
+export default React.memo(Authentication);

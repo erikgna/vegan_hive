@@ -1,20 +1,21 @@
 import { useState } from 'react';
 
-import { Modal } from './Modal'
+import Modal from './Modal'
 import { useMutation } from '@apollo/client';
 import { EDIT_USER } from '../apollo';
-import { Loading } from './Loading';
+import Loading from './Loading';
 import { IUser } from '../interfaces/User';
 import { BASE_URL } from '../constants/Url';
 
 import defaultAvatar from '../assets/images/default_avatar.png'
+import React from 'react';
 
 interface EditProfileProps {
     editProfileChangeModal: () => void;
     user: IUser;
 }
 
-export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) => {
+const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) => {
     const [description, setDescription] = useState<string>(user.description ?? '')
     const [username, setUsername] = useState<string>(user.username ?? '')
     const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
@@ -50,7 +51,7 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
                                 <label htmlFor="image" className="block text-sm font-semibold mb-2">
                                     Change Profile Image
                                 </label>
-                                <div className="bg-gray-100 border border-dashed border-gray-400 text-center p-8 cursor-pointer hover:bg-gray-200 dark:bg-black dark:hover:bg-gray-900 transition-all duration-300">
+                                <div className="bg-gray-100 border border-dashed border-gray-400 text-center p-8 cursor-pointer hover:bg-gray-200 dark:bg-[#111] dark:hover:bg-gray-900 transition-all duration-300">
                                     {selectedImage ? (
                                         <img
                                             src={URL.createObjectURL(selectedImage)}
@@ -59,7 +60,7 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
                                         />
                                     ) : (
                                         <img
-                                            src={user.iconPath === null ? defaultAvatar : `${BASE_URL}/${user.iconPath}`}
+                                            src={user.iconPath === null ? defaultAvatar : `${BASE_URL}${user.iconPath}`}
                                             alt="Old Profile"
                                             className="mx-auto h-24 w-24 mb-2 rounded-full object-cover"
                                         />
@@ -110,3 +111,5 @@ export const EditProfile = ({ editProfileChangeModal, user }: EditProfileProps) 
         </>
     )
 }
+
+export default React.memo(EditProfile)

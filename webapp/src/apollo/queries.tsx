@@ -15,9 +15,11 @@ export const QUERY_POSTS = gql`
       likes
       date
       comments {        
+        commentId
         content
         date
         author {          
+          userId
           username
           iconPath
           email

@@ -2,13 +2,14 @@ import { useQuery } from "@apollo/client";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 
-import { Post } from "../../components/Post";
+import Post from "../../components/Post";
 import { IPost } from "../../interfaces/Post";
-import { Loading } from "../../components/Loading";
+import Loading from "../../components/Loading";
 import { QUERY_POSTS } from "../../apollo";
 import noPosts from "../../assets/images/empty.svg";
+import React from "react";
 
-export const Home = () => {
+const Home = () => {
   const [currentPosts, setCurrentPosts] = useState<any>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -35,10 +36,10 @@ export const Home = () => {
     }
   }, [posts.data])
 
-  if (currentPosts.length === 0) return <Loading />;
+  if (currentPosts.length === 0) return <div className='h-screen w-screen flex items-center justify-center'><Loading /></div>
 
   return (
-    <section className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-0 sm:pl-20">
+    <section className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-4 sm:pl-20 pr-4">
       <div className={`flex flex-col align-center max-post-width ${currentPosts.length === 0 && 'justify-center'}`}>
         {currentPosts.length === 0 &&
           <div className="flex flex-col items-center justify-center">
@@ -62,3 +63,5 @@ export const Home = () => {
     </section>
   );
 };
+
+export default React.memo(Home);

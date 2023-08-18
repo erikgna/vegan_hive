@@ -2,11 +2,8 @@ import { gql } from "@apollo/client";
 
 export const CREATE_POST = gql`  
     mutation CreatePost($input: CreatePostInput!) {
-        createPost(input: $input) {
-            content,            
-            author {
-                userId
-            }
+        createPost(input: $input){
+            postId
         }
     }
 `
@@ -14,13 +11,27 @@ export const CREATE_POST = gql`
 export const CREATE_COMMENT = gql`
   mutation CreateComment($input: CreateCommentInput!) {
     createComment(input: $input) {
+      commentId
       content
       date
       author {
+        userId
         iconPath
         username
       }
     }
+  }
+`;
+
+export const DELETE_COMMENT = gql`
+  mutation DeleteComment($input: DeleteCommentInput!) {
+    deleteComment(input: $input) 
+  }
+`;
+
+export const DELETE_POST = gql`
+  mutation DeletePost($input: DeletePostInput!) {
+    deletePost(input: $input) 
   }
 `;
 

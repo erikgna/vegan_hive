@@ -30,7 +30,33 @@ const selectionSet = `
     `;
 
 export class PostResolver {
-  getUserPosts = async (_: any, args: any) => {
+  deletePost = async (_: any, args: any, context: any) => {
+    const { postId } = args.input;
+
+    const userInfo = await AuthUtils.verifyToken(context.firebaseId);
+
+    try {
+      await ogm.init();
+      const Post = ogm.model("Post");
+
+      const post = await Post.find({
+        where: { postId, author: { email: userInfo.email } },
+      });
+
+      if (post.length === 0)
+        throw new Error("You are not the author of this post.");
+
+      await Post.delete({
+        where: { postId },
+      });
+
+      return "Success";
+    } catch (error) {
+      throw new Error("Could not delete post. Please try again later.");
+    }
+  };
+  getUserPosts = async (_: any, args: any, context: any) => {
+    await AuthUtils.verifyToken(context.firebaseId);
     try {
       await ogm.init();
       const Post = ogm.model("Post");
@@ -101,7 +127,7 @@ export class PostResolver {
         update: { imagePath },
       });
 
-      return post;
+      return post.posts[0];
     } catch (error) {
       throw new Error("Could not create post. Please try again later.");
     }

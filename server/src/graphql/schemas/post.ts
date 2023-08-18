@@ -15,4 +15,7 @@ export const postTypes = gql`
     content: String!
     file: Upload!
   }
+  input DeletePostInput {
+    postId: ID!
+  }
 `;
