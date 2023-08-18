@@ -71,7 +71,7 @@ const Post = ({ post }: PostProps) => {
     };
 
     return (
-        <div className="flex flex-col bg-white p-4 shadow-md rounded-md border mt-8 dark:bg-black dark:border dark:border-gray-800">
+        <div className="sm:min-w-[550px] flex flex-col bg-white p-4 shadow-md rounded-md border mt-8 dark:bg-black dark:border dark:border-gray-800">
             {showPostModal && <PostModal postIsLiked={stateLiked ?? postIsLiked.data?.checkIfUserLikedPost} changeModal={changePostModal} post={statePost} />}
             {showModal && (
                 <Modal changeModal={changeModal}>

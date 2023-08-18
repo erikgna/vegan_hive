@@ -47,6 +47,7 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setLoading(true);
     if (formData.email === "" || formData.password === "") {
       setErrorMessage("Fill in all fields");
     } else if (
@@ -58,7 +59,6 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
       setErrorMessage("Passwords do not match");
     }
 
-    setLoading(true);
     isLogin
       ? signInWithEmailAndPassword(auth, formData.email, formData.password)
         .then(async (auth) => {
@@ -81,6 +81,7 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
           });
         })
         .catch((error) => setErrorMessage(errorMessages[error.code]))
+        .finally(() => setLoading(false))
       : createUserWithEmailAndPassword(auth, formData.email, formData.password)
         .then((_) => {
           createUser({
@@ -93,10 +94,10 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
           })
             .then((_) => navigate(ConstRoutes.LOGIN))
             .catch((_) => setErrorMessage("Error creating user"))
+            .finally(() => setLoading(false));
         })
         .catch((error) => setErrorMessage(errorMessages[error.code]));
     setFormData({ ...formData, password: "", confirmPassword: "" });
-    setLoading(false);
   };
 
   const googleSignIn = () => {
