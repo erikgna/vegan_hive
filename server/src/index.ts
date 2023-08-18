@@ -8,6 +8,7 @@ import express from "express";
 import {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageLocalDefault,
 } from "apollo-server-core";
 import cors from "cors";
 
@@ -45,7 +46,8 @@ const startApolloServer = async () => {
     csrfPrevention: false,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerPluginLandingPageDisabled(),
+      // ApolloServerPluginLandingPageDisabled(),
+      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
     context: ({ req }) => {
       const token = req.headers.authorization || "";
