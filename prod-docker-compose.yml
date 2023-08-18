@@ -24,10 +24,10 @@ services:
     volumes:
       - ./data:/data
       - ./plugins:/plugins
-  server:
+  vegan_hive_server:
     build:
       context: ./server
-    container_name: server
+    container_name: vegan_hive_server
     restart: always
     ports:
       - "4000:4000"
@@ -55,7 +55,7 @@ services:
     build: ./webapp
     container_name: vegan_hive_webapp
     depends_on:
-      - server
+      - vegan_hive_server
     ports:
       - "8013:80"
     labels:

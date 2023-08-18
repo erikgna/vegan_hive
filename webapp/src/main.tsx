@@ -33,12 +33,13 @@ const authLink = setContext(async (_, { headers }) => {
 
 const formatDateLink = new ApolloLink((operation, forward) => {
   return forward(operation).map(response => {
-    if (response.errors && response.errors[0].message.includes('Token is expired')) {
-      localStorage.removeItem('idToken');
-      localStorage.removeItem('user');
-      auth.signOut();
-      window.location.reload();
-    }
+    if (response.errors)
+      if (response.errors[0].message.includes('Token is expired')) {
+        localStorage.removeItem('idToken');
+        localStorage.removeItem('user');
+        auth.signOut();
+        window.location.reload();
+      }
 
     return response;
   });
