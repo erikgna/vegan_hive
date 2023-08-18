@@ -12,7 +12,6 @@ import { CREATE_COMMENT, LIKE_POST, POST_IS_LIKED } from "../apollo";
 
 import defaultAvatar from "../assets/images/default_avatar.png";
 import { Link } from "react-router-dom";
-import React from "react";
 
 interface PostProps {
     post: IPost;
