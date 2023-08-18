@@ -83,7 +83,7 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
         .catch((error) => setErrorMessage(errorMessages[error.code]))
         .finally(() => setLoading(false))
       : createUserWithEmailAndPassword(auth, formData.email, formData.password)
-        .then((_) => {
+        .then((user) => {
           createUser({
             variables: {
               input: {
@@ -93,10 +93,13 @@ const Authentication = ({ isLogin }: AutheticationProps) => {
             }
           })
             .then((_) => navigate(ConstRoutes.LOGIN))
-            .catch((_) => setErrorMessage("Error creating user"))
+            .catch(async (_) => {
+              await user.user.delete()
+              setErrorMessage("Error creating user")
+            })
             .finally(() => setLoading(false));
         })
-        .catch((error) => setErrorMessage(errorMessages[error.code]));
+        .catch((error) => setErrorMessage(errorMessages[error.code])).finally(() => setLoading(false));
     setFormData({ ...formData, password: "", confirmPassword: "" });
   };
 
