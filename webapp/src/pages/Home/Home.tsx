@@ -34,13 +34,13 @@ const Home = () => {
     }
   }, [posts.data])
 
-  if (currentPosts.length === 0) return <div className='h-screen w-screen flex flex-col items-center justify-center'>
+  if (currentPosts.length === 0) return <div className='h-screen w-screen flex flex-col items-center justify-center dark:bg-black'>
     <Loading />
-    <p className="mt-4 text-lg font-semibold">No posts yet</p>
+    <p className="mt-4 text-lg font-semibold dark:text-white">No posts yet</p>
   </div>
 
   return (
-    <section className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-4 sm:pl-20 pr-4">
+    <section className="w-full min-h-screen flex flex-col items-center pb-8 dark:bg-black xl:pl-[256px] pl-4 sm:pl-20 pr-4 dark:bg-black">
       <div className={`flex flex-col align-center max-post-width ${currentPosts.length === 0 && 'justify-center'}`}>
 
         <InfiniteScroll
@@ -48,7 +48,7 @@ const Home = () => {
           next={next}
           hasMore={hasMore}
           loader={<div className="mt-8 flex justify-center items-center"></div>}
-          endMessage={<h4 className="text-center text-gray-500 mt-12 mb-8">No more posts</h4>}
+          endMessage={<h4 className="text-center text-gray-500 mt-12 mb-8 dark:text-white">No more posts</h4>}
         >
           {currentPosts.map((post: IPost) => (
             <Post key={post.postId} post={post} />

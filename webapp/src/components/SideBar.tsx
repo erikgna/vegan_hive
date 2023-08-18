@@ -27,7 +27,7 @@ const SideBar = () => {
     const [showSignOutModal, setShowSignOutModal] = useState<boolean>(false)
     const [showNewPostModal, setShowNewPostModal] = useState<boolean>(false)
 
-    const { data, loading } = useQuery(QUERY_PROFILE_PICTURE, {
+    const { data, loading, error } = useQuery(QUERY_PROFILE_PICTURE, {
         variables: { email: JSON.parse(localStorage.getItem('user') ?? '{}')['email'] }
     });
 
@@ -61,6 +61,10 @@ const SideBar = () => {
 
     if (current === ConstRoutes.LOGIN || current === ConstRoutes.FORGOT_PASSWORD || current === ConstRoutes.REGISTER) {
         return null;
+    }
+
+    if (error) {
+        window.location.replace(ConstRoutes.LOGIN);
     }
 
     localStorage.setItem('userId', data?.getProfile.userId);
